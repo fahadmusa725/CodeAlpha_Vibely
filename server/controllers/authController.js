@@ -402,6 +402,8 @@ exports.resetPassword = async (req, res) => {
 
     const authToken = generateToken(user._id);
 
+    const postsCount = await Post.countDocuments({ author: user._id });
+
     return res.status(200).json({
       success: true,
       message: 'Password has been reset successfully.',
@@ -411,6 +413,16 @@ exports.resetPassword = async (req, res) => {
         fullName: user.fullName,
         email: user.email,
         avatar: user.avatar,
+        coverPhoto: user.coverPhoto,
+        bio: user.bio,
+        website: user.website,
+        location: user.location,
+        followers: user.followers,
+        following: user.following,
+        followersCount: user.followers.length,
+        followingCount: user.following.length,
+        postsCount,
+        role: user.role,
         token: authToken,
       },
     });
