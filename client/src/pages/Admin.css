@@ -52,10 +52,7 @@
   font-family: var(--font-brand);
   font-size: 1.7rem;
   font-weight: 800;
-  background: linear-gradient(90deg, #c4b5fd, #8b7cf6);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #f1f5f9;
 }
 
 .admin-nav {

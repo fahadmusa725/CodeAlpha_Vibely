@@ -66,9 +66,7 @@
   font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-primary);
 }
 
 .navbar-search-form {
