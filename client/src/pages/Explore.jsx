@@ -44,8 +44,8 @@ const Explore = () => {
         setHasMore(res.data.pagination?.hasMore || false);
         setPage(pageNum);
       }
-    } catch (err) {
-      console.error('Explore error:', err);
+    } catch {
+      // Explore fetch failed
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -56,8 +56,8 @@ const Explore = () => {
     try {
       const res = await api.get('/users/suggested');
       if (res.data.success) setSuggestedUsers(res.data.data);
-    } catch (err) {
-      console.error('Suggested users error:', err);
+    } catch {
+      // Suggested fetch failed
     }
   };
 
@@ -66,8 +66,8 @@ const Explore = () => {
       const res = await api.post(`/users/${userId}/follow`);
       updateUser({ followingCount: res.data.followingCount });
       setSuggestedUsers((prev) => prev.filter((u) => u._id !== userId));
-    } catch (err) {
-      console.error('Follow error:', err);
+    } catch {
+      // Follow toggle failed
     }
   };
 

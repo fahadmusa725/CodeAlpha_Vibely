@@ -110,7 +110,6 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
         handleClose();
       }
     } catch (err) {
-      console.error('Post creation failed:', err);
       setError(err.response?.data?.message || 'Failed to create post. Please try again.');
     } finally {
       setLoading(false);

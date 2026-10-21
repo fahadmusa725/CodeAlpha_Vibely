@@ -27,9 +27,7 @@ const PostPage = () => {
         setPost(postRes.data.data);
         setComments(commentsRes.data.data);
       })
-      .catch((err) => {
-        console.error('Failed to load post:', err);
-      })
+      .catch(() => {})
       .finally(() => {
         if (!ignore) setLoading(false);
       });
@@ -56,8 +54,8 @@ const PostPage = () => {
       setComments((prev) => [...prev, { ...res.data.data, replies: [] }]);
       setPost((prev) => ({ ...prev, commentsCount: (prev.commentsCount || 0) + 1 }));
       setCommentText('');
-    } catch (err) {
-      console.error('Add comment error:', err);
+    } catch {
+      // Failed comment handled
     } finally {
       setSubmitting(false);
     }

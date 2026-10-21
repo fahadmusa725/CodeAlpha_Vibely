@@ -20,9 +20,8 @@ const StoriesTray = () => {
     try {
       const res = await api.get('/stories/feed');
       setGroups(res.data.data || []);
-    } catch (err) {
-      console.error('Failed to fetch stories:', err);
-    } finally {
+    } catch {
+      setGroups([]);
     }
   };
 

@@ -36,8 +36,8 @@ const RightSidebar = ({ suggestedUsers = [], onFollowUser }) => {
     try {
       const res = await api.get('/posts/trending-tags?limit=5');
       if (res.data.success) setTrendingTags(res.data.data);
-    } catch (err) {
-      console.error('Failed to load trending tags:', err);
+    } catch {
+      // non-critical; widget shows empty state
     }
   };
 
@@ -46,8 +46,8 @@ const RightSidebar = ({ suggestedUsers = [], onFollowUser }) => {
     try {
       const res = await api.get('/users/me/contacts');
       if (res.data.success) setContacts(res.data.data);
-    } catch (err) {
-      console.error('Failed to load contacts:', err);
+    } catch {
+      // non-critical; widget shows empty state
     } finally {
       setLoadingContacts(false);
     }

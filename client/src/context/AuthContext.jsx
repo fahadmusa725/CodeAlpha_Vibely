@@ -16,8 +16,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await api.get('/notifications/unread-count');
       setUnreadCount(res.data.count);
-    } catch (err) {
-      console.error('Failed to load unread notifications:', err);
+    } catch {
+      // non-critical; badge simply stays stale
     }
   }, []);
 
@@ -42,8 +42,7 @@ export const AuthProvider = ({ children }) => {
             setUser(res.data.data);
             localStorage.setItem('vibely_user', JSON.stringify(res.data.data));
           }
-        } catch (err) {
-          console.error('Session verification failed:', err);
+        } catch {
           logout();
         }
       }

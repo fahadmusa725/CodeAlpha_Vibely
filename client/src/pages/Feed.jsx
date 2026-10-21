@@ -45,8 +45,8 @@ const Feed = ({ onOpenCreateModal, refreshKey }) => {
         setHasMore(res.data.pagination?.hasMore || false);
         setPage(pageNum);
       }
-    } catch (err) {
-      console.error('Feed error:', err);
+    } catch {
+      // Feed error handled
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -59,8 +59,8 @@ const Feed = ({ onOpenCreateModal, refreshKey }) => {
       if (res.data.success) {
         setSuggestedUsers(res.data.data);
       }
-    } catch (err) {
-      console.error('Suggested users error:', err);
+    } catch {
+      // Suggested fetch failed
     }
   };
 
@@ -70,8 +70,8 @@ const Feed = ({ onOpenCreateModal, refreshKey }) => {
       updateUser({ followingCount: res.data.followingCount });
       setSuggestedUsers((prev) => prev.filter((u) => u._id !== userId));
       fetchFeed(1);
-    } catch (err) {
-      console.error('Follow error:', err);
+    } catch {
+      // Follow action failed
     }
   };
 

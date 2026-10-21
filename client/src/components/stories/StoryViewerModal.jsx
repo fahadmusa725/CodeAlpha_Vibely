@@ -32,8 +32,8 @@ const StoryViewerModal = ({ groups, initialGroupIndex, onClose }) => {
     if (currentStory && !currentStory.isSeen) {
       viewRequest.current = api
         .post(`/stories/${currentStory._id}/view`)
-        .catch((err) => {
-          console.error('Failed to mark story as viewed:', err);
+        .catch(() => {
+          // non-critical; story progress still advances
         });
     }
   }, [currentStory]);
@@ -82,8 +82,8 @@ const StoryViewerModal = ({ groups, initialGroupIndex, onClose }) => {
     try {
       await api.delete(`/stories/${currentStory._id}`);
       closeViewer();
-    } catch (err) {
-      console.error('Failed to delete story:', err);
+    } catch {
+      // deletion failed; modal stays open so user can retry
     }
   };
 

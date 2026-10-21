@@ -38,7 +38,6 @@ const CreateStoryModal = ({ onClose, onStoryCreated }) => {
       if (onStoryCreated) onStoryCreated();
       onClose();
     } catch (err) {
-      console.error('Failed to create story:', err);
       setError(err.response?.data?.message || 'Failed to upload story');
     } finally {
       setUploading(false);

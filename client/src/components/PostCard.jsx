@@ -139,8 +139,7 @@ const PostCard = ({ post: initialPost, onPostDeleted, onPostUpdated, onOpenPostM
         setIsSaved(res.data.isSaved);
         if (onPostUpdated) onPostUpdated({ ...post, isLiked, likesCount, isSaved: res.data.isSaved });
       }
-    } catch (error) {
-      console.error('Save toggle error:', error);
+    } catch {
       setIsSaved(!nextState);
     }
   };

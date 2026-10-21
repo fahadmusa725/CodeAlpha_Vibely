@@ -36,8 +36,8 @@ const Search = () => {
       if (res.data.success) {
         setPopularCreators(res.data.data.slice(0, 6));
       }
-    } catch (err) {
-      console.error('Initial creators fetch error:', err);
+    } catch {
+      // Handled silently
     }
   };
 
@@ -53,8 +53,8 @@ const Search = () => {
       if (res.data.success) {
         setResults(res.data.data);
       }
-    } catch (err) {
-      console.error('Search error:', err);
+    } catch {
+      // Search failed silently
     } finally {
       setLoading(false);
     }
@@ -74,8 +74,8 @@ const Search = () => {
       setResults((prev) =>
         prev.map((u) => (u._id === targetUserId ? { ...u, isFollowing: res.data.isFollowing } : u))
       );
-    } catch (err) {
-      console.error('Follow toggle error:', err);
+    } catch {
+      // Follow toggle error handled
     }
   };
 

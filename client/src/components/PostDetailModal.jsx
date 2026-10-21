@@ -87,8 +87,8 @@ const PostDetailModal = ({ post: initialPost, isOpen, onClose, onPostUpdated }) 
       if (res.data.success) {
         setComments(res.data.data);
       }
-    } catch (err) {
-      console.error('Fetch comments failed:', err);
+    } catch {
+      // Fetch comments failed
     } finally {
       setLoadingComments(false);
     }
@@ -142,9 +142,8 @@ const PostDetailModal = ({ post: initialPost, isOpen, onClose, onPostUpdated }) 
     try {
       const res = await api.post(`/posts/${post._id}/save`);
       reportChange({ isSaved: res.data.isSaved });
-    } catch (err) {
+    } catch {
       setIsSaved(!nextState);
-      console.error('Save toggle error:', err);
     }
   };
 
@@ -192,8 +191,8 @@ const PostDetailModal = ({ post: initialPost, isOpen, onClose, onPostUpdated }) 
         setReplyingTo(null);
         updateCommentsCount((post.commentsCount || 0) + 1);
       }
-    } catch (err) {
-      console.error('Add comment error:', err);
+    } catch {
+      // Add comment failed
     } finally {
       setSubmittingComment(false);
     }
@@ -216,8 +215,8 @@ const PostDetailModal = ({ post: initialPost, isOpen, onClose, onPostUpdated }) 
       } else {
         setComments((prev) => prev.filter((c) => c._id !== commentId));
       }
-    } catch (err) {
-      console.error('Delete comment error:', err);
+    } catch {
+      // Delete comment failed
     }
   };
 
@@ -227,8 +226,8 @@ const PostDetailModal = ({ post: initialPost, isOpen, onClose, onPostUpdated }) 
       if (res.data.success) {
         await fetchComments(post._id);
       }
-    } catch (err) {
-      console.error('Pin comment error:', err);
+    } catch {
+      // Pin comment failed
     }
   };
 

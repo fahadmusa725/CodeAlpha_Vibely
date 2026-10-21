@@ -288,8 +288,7 @@ const RecentPostsCard = ({ refreshKey }) => {
           setPosts(res.data.data);
         }
       })
-      .catch((err) => {
-        console.error('Failed to load recent posts:', err);
+      .catch(() => {
         if (!ignore) setError('Could not load recent posts.');
       });
     return () => {
@@ -458,8 +457,7 @@ const RecentSignupsCard = ({ refreshKey, onViewAll }) => {
           setUsers(res.data.data);
         }
       })
-      .catch((err) => {
-        console.error('Failed to load recent signups:', err);
+      .catch(() => {
         if (!ignore) setError('Could not load recent signups.');
       });
     return () => {
@@ -543,8 +541,7 @@ const Overview = ({ onManageUsers }) => {
       .then((res) => {
         if (!ignore) setStats(res.data.data);
       })
-      .catch((err) => {
-        console.error('Failed to load admin stats:', err);
+      .catch(() => {
         if (!ignore) setError('Could not load dashboard stats.');
       });
     return () => {
@@ -569,8 +566,7 @@ const Overview = ({ onManageUsers }) => {
       }
       const date = new Date().toISOString().slice(0, 10);
       downloadFile(buildUsersCsv(rows), `vibely-users-${date}.csv`);
-    } catch (err) {
-      console.error('Failed to export users:', err);
+    } catch {
       setExportError('Could not export users. Please try again.');
     } finally {
       setExporting(false);
@@ -669,8 +665,7 @@ const UsersSection = () => {
           setUsers(res.data.data);
           setPagination(res.data.pagination);
         })
-        .catch((err) => {
-          console.error('Failed to load users:', err);
+        .catch(() => {
           if (!ignore) setError('Could not load users.');
         });
     }, 250);
@@ -695,7 +690,6 @@ const UsersSection = () => {
         prev.map((item) => (item._id === user._id ? { ...item, isVerified: res.data.data.isVerified } : item))
       );
     } catch (err) {
-      console.error('Failed to update verification:', err);
       setActionError(err.response?.data?.message || 'Could not update verification.');
     }
   };
@@ -709,7 +703,6 @@ const UsersSection = () => {
       setUsers((prev) => prev.filter((item) => item._id !== user._id));
       setPagination((prev) => ({ ...prev, total: Math.max(0, prev.total - 1) }));
     } catch (err) {
-      console.error('Failed to delete user:', err);
       setActionError(err.response?.data?.message || 'Could not delete this account.');
     }
   };

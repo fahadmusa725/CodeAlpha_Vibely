@@ -57,8 +57,8 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
         setEditWebsite(res.data.data.user.website || '');
         setEditLocation(res.data.data.user.location || '');
       }
-    } catch (err) {
-      console.error('Fetch profile error:', err);
+    } catch {
+      // Profile fetch failure handled
     } finally {
       setLoading(false);
     }
@@ -73,8 +73,8 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
       if (res.data.success) {
         setFollowUsersList(res.data.data || []);
       }
-    } catch (err) {
-      console.error(`Failed to fetch ${type}:`, err);
+    } catch {
+      // Fetch follow list failure handled
     } finally {
       setLoadingFollowList(false);
     }
@@ -104,8 +104,7 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
     try {
       const res = await api.post(`/users/${targetUser._id}/follow`);
       updateUser({ followingCount: res.data.followingCount });
-    } catch (err) {
-      console.error('Failed to toggle follow in modal:', err);
+    } catch {
       setFollowUsersList((prev) =>
         prev.map((u) =>
           u._id === targetUser._id ? { ...u, isFollowing: currentIsFollowing } : u

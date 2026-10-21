@@ -47,9 +47,7 @@ const Notifications = () => {
         setNotifications(res.data.data);
         setHasMore(res.data.pagination.hasMore);
       })
-      .catch((err) => {
-        console.error('Failed to load notifications:', err);
-      })
+      .catch(() => {})
       .finally(() => {
         if (!ignore) setLoading(false);
       });
@@ -72,8 +70,8 @@ const Notifications = () => {
       setNotifications((prev) => [...prev, ...res.data.data]);
       setHasMore(res.data.pagination.hasMore);
       setPage(nextPage);
-    } catch (err) {
-      console.error('Failed to load more notifications:', err);
+    } catch {
+      // Load more failed
     } finally {
       setLoadingMore(false);
     }
@@ -85,8 +83,8 @@ const Notifications = () => {
     try {
       await api.patch(`/notifications/${n._id}/read`);
       refreshUnreadCount();
-    } catch (err) {
-      console.error('Failed to mark notification as read:', err);
+    } catch {
+      // Mark read failed
     }
   };
 
@@ -95,8 +93,8 @@ const Notifications = () => {
       await api.patch('/notifications/read-all');
       setNotifications((prev) => prev.map((item) => ({ ...item, read: true })));
       refreshUnreadCount();
-    } catch (err) {
-      console.error('Failed to mark all notifications as read:', err);
+    } catch {
+      // Mark all read failed
     }
   };
 
@@ -116,8 +114,8 @@ const Notifications = () => {
         prev.map((item) => (item._id === n._id ? { ...item, isFollowingSender: res.data.isFollowing } : item))
       );
       updateUser({ followingCount: res.data.followingCount });
-    } catch (err) {
-      console.error('Failed to update follow:', err);
+    } catch {
+      // Follow update failed
     }
   };
 

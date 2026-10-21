@@ -25,8 +25,7 @@ const Saved = () => {
       if (res.data.success) {
         setSavedPosts(res.data.data || []);
       }
-    } catch (err) {
-      console.error('Error fetching saved posts:', err);
+    } catch {
       setSavedPosts([]);
     } finally {
       setLoading(false);
