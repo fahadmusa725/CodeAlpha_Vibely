@@ -18,14 +18,65 @@ exports.register = async (req, res) => {
   try {
     const { username, fullName, email, password } = req.body;
 
-    if (!username || !fullName || !email || !password) {
+    if (
+      typeof username !== 'string' ||
+      typeof fullName !== 'string' ||
+      typeof email !== 'string' ||
+      typeof password !== 'string'
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid field types provided',
+      });
+    }
+
+    const trimmedUsername = username.trim().toLowerCase();
+    const trimmedFullName = fullName.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+
+    if (!trimmedUsername || !trimmedFullName || !trimmedEmail || !password) {
       return res.status(400).json({
         success: false,
         message: 'Please provide all required fields (username, full name, email, password)',
       });
     }
 
-    const emailExists = await User.findOne({ email: email.toLowerCase() });
+    if (trimmedUsername.length < 3 || trimmedUsername.length > 30) {
+      return res.status(400).json({
+        success: false,
+        message: 'Username must be between 3 and 30 characters',
+      });
+    }
+
+    if (!/^[a-zA-Z0-9_.]+$/.test(trimmedUsername)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Username can only contain letters, numbers, underscores and dots',
+      });
+    }
+
+    if (trimmedFullName.length > 50) {
+      return res.status(400).json({
+        success: false,
+        message: 'Full name cannot exceed 50 characters',
+      });
+    }
+
+    if (!/\S+@\S+\.\S+/.test(trimmedEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address',
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters',
+      });
+    }
+
+    const emailExists = await User.findOne({ email: trimmedEmail });
     if (emailExists) {
       return res.status(400).json({
         success: false,
@@ -33,7 +84,7 @@ exports.register = async (req, res) => {
       });
     }
 
-    const usernameExists = await User.findOne({ username: username.toLowerCase() });
+    const usernameExists = await User.findOne({ username: trimmedUsername });
     if (usernameExists) {
       return res.status(400).json({
         success: false,
@@ -42,13 +93,13 @@ exports.register = async (req, res) => {
     }
 
     const defaultAvatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
-      fullName
+      trimmedFullName
     )}&backgroundColor=6c5ce7&textColor=ffffff`;
 
     const user = await User.create({
-      username: username.toLowerCase(),
-      fullName,
-      email: email.toLowerCase(),
+      username: trimmedUsername,
+      fullName: trimmedFullName,
+      email: trimmedEmail,
       password,
       avatar: defaultAvatar,
       coverPhoto:
@@ -86,17 +137,25 @@ exports.login = async (req, res) => {
   try {
     const { loginId, password } = req.body;
 
-    if (!loginId || !password) {
+    if (typeof loginId !== 'string' || typeof password !== 'string') {
       return res.status(400).json({
         success: false,
         message: 'Please provide email/username and password',
       });
     }
 
-    const isEmail = loginId.includes('@');
+    const trimmedLoginId = loginId.trim();
+    if (!trimmedLoginId || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide email/username and password',
+      });
+    }
+
+    const isEmail = trimmedLoginId.includes('@');
     const query = isEmail
-      ? { email: loginId.toLowerCase() }
-      : { username: loginId.toLowerCase() };
+      ? { email: trimmedLoginId.toLowerCase() }
+      : { username: trimmedLoginId.toLowerCase() };
 
     const user = await User.findOne(query).select('+password');
 
@@ -181,6 +240,13 @@ exports.changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
 
+    if (typeof currentPassword !== 'string' || typeof newPassword !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide your current and new password',
+      });
+    }
+
     if (!currentPassword || !newPassword) {
       return res.status(400).json({
         success: false,
@@ -225,11 +291,16 @@ exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
-    if (!email) {
+    if (typeof email !== 'string') {
       return res.status(400).json({ success: false, message: 'Please provide your email address' });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!trimmedEmail || !/\S+@\S+\.\S+/.test(trimmedEmail)) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid email address' });
+    }
+
+    const user = await User.findOne({ email: trimmedEmail });
 
 
     if (!user) {
@@ -283,6 +354,13 @@ exports.resetPassword = async (req, res) => {
   try {
     const { token } = req.params;
     const { password } = req.body;
+
+    if (typeof token !== 'string' || typeof password !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid request payload',
+      });
+    }
 
     if (!password || password.length < 6) {
       return res.status(400).json({

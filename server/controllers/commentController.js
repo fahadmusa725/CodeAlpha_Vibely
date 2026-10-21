@@ -7,10 +7,25 @@ exports.addComment = async (req, res) => {
     const { postId } = req.params;
     const { text, parentComment } = req.body;
 
-    if (!text || !text.trim()) {
+    if (typeof text !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Comment text must be a string',
+      });
+    }
+
+    const trimmedText = text.trim();
+    if (!trimmedText) {
       return res.status(400).json({
         success: false,
         message: 'Comment text is required',
+      });
+    }
+
+    if (trimmedText.length > 1000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Comment cannot exceed 1000 characters',
       });
     }
 

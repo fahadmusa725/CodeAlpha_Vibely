@@ -17,6 +17,16 @@ exports.createPost = async (req, res) => {
     const { caption, location, tags } = req.body;
     const authorId = req.user._id;
 
+    if (caption !== undefined && typeof caption !== 'string') {
+      return res.status(400).json({ success: false, message: 'Caption must be a string' });
+    }
+    if (caption && caption.length > 2200) {
+      return res.status(400).json({ success: false, message: 'Caption cannot exceed 2200 characters' });
+    }
+    if (location !== undefined && typeof location !== 'string') {
+      return res.status(400).json({ success: false, message: 'Location must be a string' });
+    }
+
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({
         success: false,
@@ -386,10 +396,21 @@ exports.editPost = async (req, res) => {
     const { caption, location, tags } = req.body;
 
     if (caption !== undefined) {
+      if (typeof caption !== 'string') {
+        return res.status(400).json({ success: false, message: 'Caption must be a string' });
+      }
+      if (caption.length > 2200) {
+        return res.status(400).json({ success: false, message: 'Caption cannot exceed 2200 characters' });
+      }
       post.caption = caption;
       post.hashtags = extractHashtags(caption);
     }
-    if (location !== undefined) post.location = location;
+    if (location !== undefined) {
+      if (typeof location !== 'string') {
+        return res.status(400).json({ success: false, message: 'Location must be a string' });
+      }
+      post.location = location.trim();
+    }
     if (tags !== undefined) {
       if (Array.isArray(tags)) {
         post.tags = tags;

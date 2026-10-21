@@ -80,10 +80,52 @@ exports.updateProfile = async (req, res) => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    if (fullName !== undefined) user.fullName = fullName.trim();
-    if (bio !== undefined) user.bio = bio.trim();
-    if (website !== undefined) user.website = website.trim();
-    if (location !== undefined) user.location = location.trim();
+    if (fullName !== undefined) {
+      if (typeof fullName !== 'string') {
+        return res.status(400).json({ success: false, message: 'Full name must be a string' });
+      }
+      const trimmed = fullName.trim();
+      if (!trimmed) {
+        return res.status(400).json({ success: false, message: 'Full name cannot be empty' });
+      }
+      if (trimmed.length > 50) {
+        return res.status(400).json({ success: false, message: 'Full name cannot exceed 50 characters' });
+      }
+      user.fullName = trimmed;
+    }
+
+    if (bio !== undefined) {
+      if (typeof bio !== 'string') {
+        return res.status(400).json({ success: false, message: 'Bio must be a string' });
+      }
+      const trimmed = bio.trim();
+      if (trimmed.length > 200) {
+        return res.status(400).json({ success: false, message: 'Bio cannot exceed 200 characters' });
+      }
+      user.bio = trimmed;
+    }
+
+    if (website !== undefined) {
+      if (typeof website !== 'string') {
+        return res.status(400).json({ success: false, message: 'Website must be a string' });
+      }
+      const trimmed = website.trim();
+      if (trimmed.length > 60) {
+        return res.status(400).json({ success: false, message: 'Website cannot exceed 60 characters' });
+      }
+      user.website = trimmed;
+    }
+
+    if (location !== undefined) {
+      if (typeof location !== 'string') {
+        return res.status(400).json({ success: false, message: 'Location must be a string' });
+      }
+      const trimmed = location.trim();
+      if (trimmed.length > 100) {
+        return res.status(400).json({ success: false, message: 'Location cannot exceed 100 characters' });
+      }
+      user.location = trimmed;
+    }
 
     await user.save();
 
