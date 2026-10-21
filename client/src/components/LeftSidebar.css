@@ -134,7 +134,6 @@
 .ls-nav-item.active {
   background: var(--accent-primary);
   color: #ffffff;
-  box-shadow: 0 4px 16px var(--accent-glow);
 }
 
 .ls-nav-item.active:hover {

@@ -12,8 +12,6 @@
   justify-content: space-around;
   padding: 0 12px;
   z-index: 1000;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .mob-nav-item {
@@ -23,8 +21,8 @@
   color: var(--text-tertiary);
   width: 44px;
   height: 44px;
-  border-radius: 12px;
-  transition: all 0.15s ease;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease;
   background: none;
   border: none;
   cursor: pointer;
@@ -52,20 +50,23 @@
 }
 
 .create-mob .plus-btn-inner {
-  background: var(--accent-gradient);
+  background: var(--accent-primary);
   color: #ffffff;
-  width: 44px;
+  width: 40px;
   height: 36px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px var(--accent-glow);
-  transition: transform 0.15s ease;
+  transition: background-color 0.15s ease;
+}
+
+.create-mob:hover .plus-btn-inner {
+  background: var(--accent-hover);
 }
 
 .create-mob:active .plus-btn-inner {
-  transform: scale(0.92);
+  background: var(--accent-hover);
 }
 
 @media (max-width: 900px) {

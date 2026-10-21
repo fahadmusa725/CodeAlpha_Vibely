@@ -10,9 +10,10 @@
   width: 100%;
   max-width: 460px;
   padding: 40px 36px;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
-  box-shadow: 0 16px 40px -8px rgba(108, 92, 231, 0.15), 0 0 1px 1px var(--accent-border);
+  box-shadow: var(--shadow-md);
+  background: var(--bg-surface);
 }
 
 .auth-brand-header {
@@ -24,15 +25,14 @@
 }
 
 .auth-logo-badge {
-  width: 58px;
-  height: 58px;
-  border-radius: var(--radius-lg);
-  background: var(--accent-gradient);
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  background: var(--accent-primary);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px var(--accent-glow);
   margin-bottom: 14px;
 }
 
@@ -113,7 +113,6 @@
 
 .auth-input-wrapper input:focus {
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 4px var(--accent-light);
 }
 
 .auth-submit-btn {

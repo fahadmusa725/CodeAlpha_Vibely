@@ -193,7 +193,7 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(15, 23, 42, 0.65);
+  background: rgba(15, 23, 42, 0.8);
   color: #ffffff;
   width: 32px;
   height: 32px;
@@ -201,15 +201,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(4px);
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition: background-color 0.15s ease;
   z-index: 10;
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .carousel-btn:hover {
-  background: rgba(15, 23, 42, 0.9);
-  transform: translateY(-50%) scale(1.08);
+  background: rgba(15, 23, 42, 0.95);
 }
 
 .carousel-btn.prev {
@@ -225,10 +223,9 @@
   display: flex;
   gap: 5px;
   z-index: 10;
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(15, 23, 42, 0.7);
   padding: 4px 8px;
   border-radius: 12px;
-  backdrop-filter: blur(4px);
 }
 
 .carousel-dots .dot {

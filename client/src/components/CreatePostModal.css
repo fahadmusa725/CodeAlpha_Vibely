@@ -1,8 +1,7 @@
 .create-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.65);
   z-index: 1100;
   display: flex;
   align-items: center;
@@ -14,10 +13,10 @@
   width: 100%;
   max-width: 520px;
   background: var(--bg-surface);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--border-color);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
   transition: max-width 0.25s ease;
@@ -154,10 +153,9 @@
   left: 12px;
   display: flex;
   gap: 6px;
-  background: rgba(15, 23, 42, 0.65);
+  background: rgba(15, 23, 42, 0.8);
   padding: 4px 8px;
-  border-radius: 20px;
-  backdrop-filter: blur(6px);
+  border-radius: var(--radius-sm);
   z-index: 10;
 }
 

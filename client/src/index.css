@@ -101,13 +101,12 @@ a {
 }
 
 button, .btn, .icon-btn-ghost, .action-btn-icon, .nav-pill, .author-avatar, .caption-username {
-  transition: transform 0.1s cubic-bezier(0.2, 0, 0.13, 1.5), opacity 0.15s ease, color 0.15s ease, background 0.15s ease;
+  transition: opacity 0.15s ease, color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
   user-select: none;
 }
 
 button:active, .btn:active, .icon-btn-ghost:active, .action-btn-icon:active {
-  transform: scale(0.95);
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 button {
@@ -118,9 +117,19 @@ button {
   outline: none;
 }
 
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
 input, textarea, select {
   font-family: var(--font-body);
   outline: none;
+}
+
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 0;
 }
 
 img {
@@ -148,13 +157,15 @@ img {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 7px 16px;
-  border-radius: 8px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.84rem;
-  transition: all 0.15s ease;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   white-space: nowrap;
+  border: 1px solid transparent;
 }
 
 .btn-primary {
@@ -165,11 +176,11 @@ img {
   background: var(--accent-hover);
 }
 .btn-primary:active {
-  transform: scale(0.96);
+  background: var(--accent-hover);
 }
 
 .btn-secondary {
-  background: var(--bg-subtle);
+  background: var(--bg-surface);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
 }
@@ -199,17 +210,16 @@ img {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.65);
   z-index: 1100;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
-  animation: modalFadeIn 0.2s ease-out;
+  animation: modalFadeIn 0.15s ease-out;
 }
 
 @keyframes modalFadeIn {
-  from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
