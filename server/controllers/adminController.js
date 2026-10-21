@@ -153,7 +153,7 @@ exports.getStats = async (req, res) => {
     console.error('admin getStats error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error loading dashboard stats',
+      message: 'Server error loading dashboard stats',
     });
   }
 };
@@ -183,7 +183,7 @@ exports.getRecentPosts = async (req, res) => {
     console.error('admin getRecentPosts error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error loading recent posts',
+      message: 'Server error loading recent posts',
     });
   }
 };
@@ -239,7 +239,7 @@ exports.listUsers = async (req, res) => {
     console.error('admin listUsers error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error loading users',
+      message: 'Server error loading users',
     });
   }
 };
@@ -262,7 +262,7 @@ exports.toggleVerify = async (req, res) => {
     console.error('admin toggleVerify error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error updating verification',
+      message: 'Server error updating verification',
     });
   }
 };
@@ -291,7 +291,7 @@ exports.deleteUser = async (req, res) => {
     console.error('admin deleteUser error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error deleting user',
+      message: 'Server error deleting user',
     });
   }
 };

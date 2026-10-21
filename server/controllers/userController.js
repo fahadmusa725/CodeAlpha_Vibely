@@ -66,7 +66,7 @@ exports.getUserProfile = async (req, res) => {
     console.error('getUserProfile error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error fetching user profile',
+      message: 'Server error fetching user profile',
     });
   }
 };
@@ -135,10 +135,14 @@ exports.updateProfile = async (req, res) => {
       data: user,
     });
   } catch (error) {
+    if (error.name === 'ValidationError') {
+      const firstMessage = Object.values(error.errors || {})[0]?.message || 'Validation failed';
+      return res.status(400).json({ success: false, message: firstMessage });
+    }
     console.error('updateProfile error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error updating profile',
+      message: 'Server error updating profile',
     });
   }
 };
@@ -181,7 +185,7 @@ exports.updateUserMedia = async (req, res) => {
     console.error('updateUserMedia error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error updating media',
+      message: 'Server error updating media',
     });
   }
 };
@@ -244,7 +248,7 @@ exports.toggleFollow = async (req, res) => {
     console.error('toggleFollow error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error following/unfollowing user',
+      message: 'Server error following/unfollowing user',
     });
   }
 };
@@ -269,9 +273,10 @@ exports.getFollowers = async (req, res) => {
       })),
     });
   } catch (error) {
+    console.error('getFollowers error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error retrieving followers',
+      message: 'Server error retrieving followers',
     });
   }
 };
@@ -296,9 +301,10 @@ exports.getFollowing = async (req, res) => {
       })),
     });
   } catch (error) {
+    console.error('getFollowing error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error retrieving following list',
+      message: 'Server error retrieving following list',
     });
   }
 };
@@ -332,7 +338,7 @@ exports.searchUsers = async (req, res) => {
     console.error('searchUsers error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error searching users',
+      message: 'Server error searching users',
     });
   }
 };
@@ -393,7 +399,7 @@ exports.getSuggestedUsers = async (req, res) => {
     console.error('getSuggestedUsers error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error getting suggestions',
+      message: 'Server error getting suggestions',
     });
   }
 };
@@ -426,7 +432,7 @@ exports.getContacts = async (req, res) => {
     console.error('getContacts error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error retrieving contacts',
+      message: 'Server error retrieving contacts',
     });
   }
 };
@@ -470,7 +476,7 @@ exports.getSavedPosts = async (req, res) => {
     console.error('getSavedPosts error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error fetching saved posts',
+      message: 'Server error fetching saved posts',
     });
   }
 };

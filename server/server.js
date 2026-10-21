@@ -99,9 +99,11 @@ app.use((err, req, res, next) => {
   }
   console.error('Unhandled Error:', err);
   const statusCode = err.statusCode || 500;
+  const isProd = process.env.NODE_ENV === 'production';
+  const defaultMessage = statusCode >= 500 ? 'Internal Server Error' : (err.message || 'Error occurred');
   res.status(statusCode).json({
     success: false,
-    message: err.message || 'Internal Server Error',
+    message: isProd && statusCode >= 500 ? 'Internal Server Error' : (err.message || defaultMessage),
     stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
   });
 });

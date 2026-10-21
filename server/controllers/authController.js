@@ -125,10 +125,21 @@ exports.register = async (req, res) => {
       },
     });
   } catch (error) {
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern || {})[0] || 'field';
+      const message = field === 'email'
+        ? 'An account with this email already exists'
+        : 'This username is already taken. Please pick another.';
+      return res.status(400).json({ success: false, message });
+    }
+    if (error.name === 'ValidationError') {
+      const firstMessage = Object.values(error.errors || {})[0]?.message || 'Validation failed';
+      return res.status(400).json({ success: false, message: firstMessage });
+    }
     console.error('Register error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error during registration',
+      message: 'Server error during registration',
     });
   }
 };
@@ -202,7 +213,7 @@ exports.login = async (req, res) => {
     console.error('Login error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error during login',
+      message: 'Server error during login',
     });
   }
 };
@@ -229,9 +240,10 @@ exports.getMe = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error('getMe error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error getting user profile',
+      message: 'Server error getting user profile',
     });
   }
 };
@@ -282,7 +294,7 @@ exports.changePassword = async (req, res) => {
     console.error('changePassword error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error changing password',
+      message: 'Server error changing password',
     });
   }
 };
@@ -345,7 +357,7 @@ exports.forgotPassword = async (req, res) => {
     console.error('forgotPassword error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error processing password reset request',
+      message: 'Server error processing password reset request',
     });
   }
 };
@@ -406,7 +418,7 @@ exports.resetPassword = async (req, res) => {
     console.error('resetPassword error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error resetting password',
+      message: 'Server error resetting password',
     });
   }
 };

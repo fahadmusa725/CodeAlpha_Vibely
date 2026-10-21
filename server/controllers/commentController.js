@@ -85,7 +85,7 @@ exports.addComment = async (req, res) => {
     console.error('addComment error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error adding comment',
+      message: 'Server error adding comment',
     });
   }
 };
@@ -125,7 +125,7 @@ exports.getComments = async (req, res) => {
     console.error('getComments error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error retrieving comments',
+      message: 'Server error retrieving comments',
     });
   }
 };
@@ -173,7 +173,7 @@ exports.deleteComment = async (req, res) => {
     console.error('deleteComment error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error deleting comment',
+      message: 'Server error deleting comment',
     });
   }
 };
@@ -225,7 +225,7 @@ exports.pinComment = async (req, res) => {
     console.error('pinComment error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error pinning comment',
+      message: 'Server error pinning comment',
     });
   }
 };

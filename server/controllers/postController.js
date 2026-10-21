@@ -78,7 +78,7 @@ exports.createPost = async (req, res) => {
     console.error('createPost error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error creating post',
+      message: 'Server error creating post',
     });
   }
 };
@@ -139,7 +139,7 @@ exports.getFeed = async (req, res) => {
     console.error('getFeed error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error loading feed',
+      message: 'Server error loading feed',
     });
   }
 };
@@ -196,7 +196,7 @@ exports.getDiscover = async (req, res) => {
     console.error('getDiscover error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error fetching explore posts',
+      message: 'Server error fetching explore posts',
     });
   }
 };
@@ -214,7 +214,7 @@ exports.getTrendingTags = async (req, res) => {
     console.error('getTrendingTags error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error fetching trending tags',
+      message: 'Server error fetching trending tags',
     });
   }
 };
@@ -259,7 +259,7 @@ exports.getPostById = async (req, res) => {
     console.error('getPostById error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error fetching post',
+      message: 'Server error fetching post',
     });
   }
 };
@@ -301,7 +301,7 @@ exports.toggleLike = async (req, res) => {
     console.error('toggleLike error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error liking post',
+      message: 'Server error liking post',
     });
   }
 };
@@ -341,7 +341,7 @@ exports.toggleSave = async (req, res) => {
     console.error('toggleSave error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error saving post',
+      message: 'Server error saving post',
     });
   }
 };
@@ -373,7 +373,7 @@ exports.deletePost = async (req, res) => {
     console.error('deletePost error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error deleting post',
+      message: 'Server error deleting post',
     });
   }
 };
@@ -446,7 +446,7 @@ exports.editPost = async (req, res) => {
     console.error('editPost error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error editing post',
+      message: 'Server error editing post',
     });
   }
 };

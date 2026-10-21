@@ -51,7 +51,7 @@ exports.getNotifications = async (req, res) => {
     console.error('getNotifications error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error loading notifications',
+      message: 'Server error loading notifications',
     });
   }
 };
@@ -68,7 +68,7 @@ exports.getUnreadCount = async (req, res) => {
     console.error('getUnreadCount error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error loading unread count',
+      message: 'Server error loading unread count',
     });
   }
 };
@@ -85,7 +85,7 @@ exports.markAllRead = async (req, res) => {
     console.error('markAllRead error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error marking notifications read',
+      message: 'Server error marking notifications read',
     });
   }
 };
@@ -106,7 +106,7 @@ exports.markRead = async (req, res) => {
     console.error('markRead error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error marking notification read',
+      message: 'Server error marking notification read',
     });
   }
 };

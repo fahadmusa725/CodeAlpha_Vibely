@@ -75,7 +75,7 @@ exports.createStory = async (req, res) => {
     console.error('createStory error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error creating story',
+      message: 'Server error creating story',
     });
   }
 };
@@ -116,7 +116,7 @@ exports.getStoryFeed = async (req, res) => {
     console.error('getStoryFeed error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error loading story feed',
+      message: 'Server error loading story feed',
     });
   }
 };
@@ -141,7 +141,7 @@ exports.markViewed = async (req, res) => {
     console.error('markViewed error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error marking story viewed',
+      message: 'Server error marking story viewed',
     });
   }
 };
@@ -167,7 +167,7 @@ exports.deleteStory = async (req, res) => {
     console.error('deleteStory error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Server error deleting story',
+      message: 'Server error deleting story',
     });
   }
 };
