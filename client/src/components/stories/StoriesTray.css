@@ -47,7 +47,7 @@
 }
 
 .story-avatar-ring.unseen {
-  background: linear-gradient(45deg, #f09433, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  background: var(--accent-primary);
 }
 
 .story-avatar-ring.seen {
@@ -78,7 +78,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--accent-primary, #6c5ce7);
+  background: var(--accent-primary);
   color: #ffffff;
   border: 2px solid var(--bg-surface);
   font-size: 13px;
