@@ -30,16 +30,27 @@ const app = express();
 
 app.use(helmet());
 
-const allowedOrigins = (process.env.CLIENT_URL || '')
+const isProduction = process.env.NODE_ENV === 'production';
+const configuredOrigins = (process.env.CLIENT_URL || '')
   .split(',')
   .map((origin) => origin.trim().replace(/\/$/, ''))
   .filter(Boolean);
 
+const allowedOrigins = configuredOrigins.length > 0
+  ? configuredOrigins
+  : (isProduction ? [] : ['http://localhost:5173']);
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      const requestOrigin = origin ? origin.replace(/\/$/, '') : origin;
-      callback(null, !requestOrigin || allowedOrigins.length === 0 || allowedOrigins.includes(requestOrigin));
+      if (!origin) {
+        return callback(null, true);
+      }
+      const requestOrigin = origin.replace(/\/$/, '');
+      if (allowedOrigins.includes(requestOrigin)) {
+        return callback(null, true);
+      }
+      return callback(null, false);
     },
     credentials: true,
   })
