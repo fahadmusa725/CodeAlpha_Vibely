@@ -174,7 +174,7 @@ const ResetPassword = () => {
             <div className="fp-success-icon">
               <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: 48 }} />
             </div>
-            <h2>Password Reset!</h2>
+            <h2>Password reset</h2>
             <p>Your password has been changed successfully. Redirecting you to the home page...</p>
           </div>
         )}

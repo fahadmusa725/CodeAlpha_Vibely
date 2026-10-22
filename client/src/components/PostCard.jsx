@@ -172,7 +172,7 @@ const PostCard = ({ post: initialPost, onPostDeleted, onPostUpdated, onOpenPostM
     if (navigator.clipboard) {
       navigator.clipboard.writeText(postUrl);
     }
-    setToastMessage('Link copied to clipboard!');
+    setToastMessage('Link copied to clipboard.');
     setTimeout(() => setToastMessage(''), 3000);
   };
 

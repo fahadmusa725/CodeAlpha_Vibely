@@ -114,7 +114,7 @@ const ChangePasswordPanel = () => {
       {error && <p className="settings-error">{error}</p>}
       {success && (
         <p className="settings-success">
-          <FontAwesomeIcon icon={faCheck} style={{ fontSize: 14 }} /> Password changed successfully!
+          <FontAwesomeIcon icon={faCheck} style={{ fontSize: 14 }} /> Password changed successfully.
         </p>
       )}
 
@@ -229,7 +229,7 @@ const EditProfilePanel = ({ user, updateUser }) => {
       {error && <p className="settings-error">{error}</p>}
       {success && (
         <p className="settings-success">
-          <FontAwesomeIcon icon={faCheck} style={{ fontSize: 14 }} /> Profile updated successfully!
+          <FontAwesomeIcon icon={faCheck} style={{ fontSize: 14 }} /> Profile updated successfully.
         </p>
       )}
 

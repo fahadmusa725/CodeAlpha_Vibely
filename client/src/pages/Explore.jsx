@@ -159,7 +159,7 @@ const Explore = () => {
           <div className="card explore-empty">
             <FontAwesomeIcon icon={faCompass} style={{ fontSize: 40 }} className="empty-icon" />
             <h3>No posts found yet</h3>
-            <p>Be the very first creator to share a moment on Vibely!</p>
+            <p>No posts have been shared yet.</p>
           </div>
         )}
 

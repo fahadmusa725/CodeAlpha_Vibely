@@ -70,8 +70,8 @@ const Auth = ({ mode = 'login' }) => {
           <h1>Vibely</h1>
           <p>
             {isLogin
-              ? 'Welcome back! Share what inspires you.'
-              : 'Join a modern community of creators & thinkers.'}
+              ? 'Sign in to your account.'
+              : 'Create an account to get started.'}
           </p>
         </div>
 

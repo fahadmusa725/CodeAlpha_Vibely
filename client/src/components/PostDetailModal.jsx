@@ -160,7 +160,7 @@ const PostDetailModal = ({ post: initialPost, isOpen, onClose, onPostUpdated }) 
     if (navigator.clipboard) {
       navigator.clipboard.writeText(postUrl);
     }
-    setToastMessage('Link copied to clipboard!');
+    setToastMessage('Link copied to clipboard.');
     setTimeout(() => setToastMessage(''), 3000);
   };
 
@@ -474,7 +474,7 @@ const PostDetailModal = ({ post: initialPost, isOpen, onClose, onPostUpdated }) 
                 ))
               ) : (
                 <div className="no-comments-prompt">
-                  <p>No comments yet. Start the conversation!</p>
+                  <p>No comments yet.</p>
                 </div>
               )}
             </div>
