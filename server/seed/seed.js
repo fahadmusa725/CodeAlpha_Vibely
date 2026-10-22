@@ -598,40 +598,7 @@ const seedRichData = async () => {
 
     console.log(`Created ${storyCount} stories across 8 users.`);
 
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    const topTrending = await Post.aggregate([
-      { $match: { createdAt: { $gte: thirtyDaysAgo } } },
-      { $unwind: '$hashtags' },
-      {
-        $group: {
-          _id: '$hashtags',
-          count: { $sum: 1 },
-          latestPostDate: { $max: '$createdAt' },
-        },
-      },
-      { $sort: { count: -1, latestPostDate: -1, _id: 1 } },
-      { $limit: 5 },
-      {
-        $project: {
-          _id: 0,
-          tag: '$_id',
-          count: 1,
-        },
-      },
-    ]);
-
-    console.log('\n=========================================');
-    console.log('DATABASE SEEDING COMPLETED SUCCESSFULLY!');
-    console.log('Top 5 Trending Tags:');
-    topTrending.forEach((item, index) => {
-      console.log(` ${index + 1}. #${item.tag}: ${item.count} ${item.count === 1 ? 'post' : 'posts'}`);
-    });
-    console.log('Sample Accounts (Password: password123):');
-    console.log(' - sophia_arts / sophia@vibely.app');
-    console.log(' - marcus_vance / marcus@vibely.app');
-    console.log(' - elena_codes / elena@vibely.app');
-    console.log(' - kai_zen / kai@vibely.app');
-    console.log('=========================================\n');
+    console.log('Seeding complete.');
 
     process.exit(0);
   } catch (err) {

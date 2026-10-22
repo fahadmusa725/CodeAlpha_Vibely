@@ -83,8 +83,6 @@ exports.createStory = async (req, res) => {
 exports.getStoryFeed = async (req, res) => {
   try {
     const currentUser = await User.findById(req.user._id);
-    const followingIds = currentUser.following.map((id) => id.toString());
-
     const authorIds = [req.user._id, ...currentUser.following];
 
     const stories = await Story.find({
