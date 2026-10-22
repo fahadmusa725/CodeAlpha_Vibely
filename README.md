@@ -85,12 +85,6 @@ npm run seed
 
 The seed script deletes existing records that have `isSeeded: true`, `@vibely.app` email domains, or matching seed usernames, then inserts 15 creator profiles. All seeded user accounts use the password `password123`.
 
-To backfill hashtags on existing posts:
-
-```bash
-cd server
-npm run backfill:hashtags
-```
 
 ## Environment Variables
 
@@ -215,11 +209,12 @@ Vibely/
     ├── scripts/
     │   └── ensureAdmin.js
     ├── seed/
-    │   ├── backfillHashtags.js
     │   └── seed.js
     ├── utils/
     │   ├── email.js
-    │   └── notify.js
+    │   ├── escapeRegex.js
+    │   ├── notify.js
+    │   └── trending.js
     ├── .env.example
     ├── package.json
     └── server.js
