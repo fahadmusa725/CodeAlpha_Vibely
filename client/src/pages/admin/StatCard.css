@@ -1,0 +1,64 @@
+.admin-stat-card {
+  --tone: #7c5cff;
+  --tone-rgb: 124, 92, 255;
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-stat-card.tone-violet {
+  --tone: #7c5cff;
+  --tone-rgb: 124, 92, 255;
+}
+
+.admin-stat-card.tone-blue {
+  --tone: #3b82f6;
+  --tone-rgb: 59, 130, 246;
+}
+
+.admin-stat-card.tone-pink {
+  --tone: #ec4899;
+  --tone-rgb: 236, 72, 153;
+}
+
+.admin-stat-card.tone-teal {
+  --tone: #14b8a6;
+  --tone-rgb: 20, 184, 166;
+}
+
+.admin-stat-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  background: rgba(var(--tone-rgb), 0.18);
+  color: var(--tone);
+}
+
+.admin-stat-label {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.admin-stat-value {
+  margin: 6px 0 10px;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.admin-stat-skeleton {
+  height: 34px;
+  width: 55%;
+  margin: 6px 0 10px;
+}

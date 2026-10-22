@@ -1,0 +1,64 @@
+.admin-quick-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-quick-action {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.admin-quick-action:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.admin-quick-action.shade-1 {
+  background: var(--accent-primary);
+}
+
+.admin-quick-action.shade-2 {
+  background: #0284c7;
+}
+
+.admin-quick-action.shade-3 {
+  background: #075985;
+}
+
+.admin-quick-action:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.admin-quick-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
+}
+
+.admin-quick-text {
+  flex: 1;
+}
+
+.admin-export-error {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: var(--danger);
+}

@@ -1,0 +1,26 @@
+.admin-trend-line {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.admin-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.admin-trend.up {
+  color: #10b981;
+}
+
+.admin-trend.down {
+  color: #f43f5e;
+}
+
+.admin-stat-note {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+}

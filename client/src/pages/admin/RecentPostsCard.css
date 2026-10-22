@@ -1,0 +1,109 @@
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-posts-table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.admin-posts-table th {
+  padding: 0 10px 12px;
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.admin-posts-table td {
+  padding: 10px;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.admin-posts-table tbody tr:hover td {
+  background: var(--bg-hover);
+}
+
+.admin-post-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.admin-post-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.admin-post-thumb-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-subtle);
+  color: var(--text-tertiary);
+}
+
+.admin-post-caption {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.admin-author-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.admin-author-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.admin-author-missing {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--text-tertiary);
+}
+
+.admin-engagement {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  white-space: nowrap;
+}
+
+.admin-engagement-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+}
+
+.admin-engagement-item.likes svg {
+  color: #ec4899;
+}
+
+.admin-engagement-item.comments svg {
+  color: var(--text-tertiary);
+}
+
+.admin-col-date {
+  text-align: right;
+  white-space: nowrap;
+}

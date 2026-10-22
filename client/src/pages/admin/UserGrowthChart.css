@@ -1,0 +1,64 @@
+.admin-row {
+  display: grid;
+  gap: 20px;
+}
+
+.admin-row-chart {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+}
+
+.admin-row-bottom {
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+}
+
+.admin-chart {
+  width: 100%;
+}
+
+.admin-chart .recharts-cartesian-grid-horizontal line {
+  stroke: var(--border-subtle);
+}
+
+.admin-chart-skeleton {
+  height: 230px;
+  border-radius: 12px;
+}
+
+.admin-card {
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-card);
+  min-width: 0;
+}
+
+.admin-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.admin-card-header h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.admin-card-header p {
+  margin-top: 4px;
+  font-size: 0.82rem;
+  color: var(--text-tertiary);
+}
+
+.admin-period-chip {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}

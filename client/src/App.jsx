@@ -14,7 +14,7 @@ import Profile from './pages/Profile';
 import Saved from './pages/Saved';
 import Settings from './pages/Settings';
 import PostPage from './pages/PostPage';
-import Admin from './pages/Admin';
+import Admin from './pages/admin/AdminLayout';
 import Auth from './pages/Auth';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';

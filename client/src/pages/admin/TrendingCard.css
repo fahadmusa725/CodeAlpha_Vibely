@@ -1,0 +1,38 @@
+.admin-rank-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-rank-item {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.admin-rank-item + .admin-rank-item {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.admin-rank-number {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+.admin-rank-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-rank-count {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}

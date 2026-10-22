@@ -1,0 +1,36 @@
+.admin-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 24px 12px;
+  text-align: center;
+}
+
+.admin-empty-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  background: var(--accent-light);
+  color: var(--accent-primary);
+}
+
+.admin-empty-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.admin-empty-text {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+}
+
+.admin-empty-error p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}

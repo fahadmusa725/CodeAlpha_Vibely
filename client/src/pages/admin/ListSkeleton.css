@@ -1,0 +1,10 @@
+.admin-list-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-list-skeleton .skeleton {
+  height: 40px;
+  border-radius: 10px;
+}
