@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faCircleCheck, faMagnifyingGlass, faUsers, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -21,13 +21,19 @@ const Search = () => {
     fetchInitialCreators();
   }, []);
 
+  const debounceRef = useRef(null);
+
   useEffect(() => {
     setQuery(urlQuery);
+    clearTimeout(debounceRef.current);
     if (urlQuery.trim()) {
-      handleSearch(urlQuery);
+      debounceRef.current = setTimeout(() => {
+        handleSearch(urlQuery);
+      }, 300);
     } else {
       setResults([]);
     }
+    return () => clearTimeout(debounceRef.current);
   }, [urlQuery]);
 
   const fetchInitialCreators = async () => {
