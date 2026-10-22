@@ -10,6 +10,9 @@
   height: 160px;
   border-radius: 12px 12px 0 0;
   overflow: hidden;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-bottom: none;
 }
 
 .profile-cover-img {

@@ -224,11 +224,13 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
   return (
     <div className="profile-container">
       <div className="profile-cover-wrapper">
-        <img
-          src={profileUser.coverPhoto || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200'}
-          alt="Cover"
-          className="profile-cover-img"
-        />
+        {profileUser.coverPhoto ? (
+          <img
+            src={profileUser.coverPhoto}
+            alt="Cover"
+            className="profile-cover-img"
+          />
+        ) : null}
         {isOwnProfile && (
           <button
             className="change-cover-btn"
