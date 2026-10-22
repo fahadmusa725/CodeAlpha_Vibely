@@ -35,9 +35,10 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.admin-search-input:focus {
+.admin-search-input:focus,
+.admin-search-input:focus-visible {
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px var(--accent-light);
+  outline: none;
 }
 
 .admin-search-clear {

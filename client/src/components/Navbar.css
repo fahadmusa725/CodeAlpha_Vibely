@@ -93,9 +93,11 @@
   transition: all 0.2s ease;
 }
 
-.navbar-search-input:focus {
+.navbar-search-input:focus,
+.navbar-search-input:focus-visible {
   background: var(--bg-surface);
   border-color: var(--accent-primary);
+  outline: none;
 }
 
 .navbar-search-input::placeholder {

@@ -299,6 +299,11 @@
   outline: none;
 }
 
+.create-caption-textarea:focus,
+.create-caption-textarea:focus-visible {
+  outline: none;
+}
+
 .caption-footer-meta {
   display: flex;
   justify-content: flex-end;
@@ -328,6 +333,11 @@
   border: none;
   font-size: 0.85rem;
   color: var(--text-primary);
+  outline: none;
+}
+
+.details-field-input:focus,
+.details-field-input:focus-visible {
   outline: none;
 }
 

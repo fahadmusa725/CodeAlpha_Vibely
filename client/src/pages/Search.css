@@ -35,6 +35,11 @@
   color: var(--text-primary);
 }
 
+.search-input:focus,
+.search-input:focus-visible {
+  outline: none;
+}
+
 .clear-btn {
   color: var(--text-tertiary);
   font-size: 1rem;

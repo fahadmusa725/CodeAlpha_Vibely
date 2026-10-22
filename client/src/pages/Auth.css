@@ -111,8 +111,10 @@
   transition: all 0.2s ease;
 }
 
-.auth-input-wrapper input:focus {
+.auth-input-wrapper input:focus,
+.auth-input-wrapper input:focus-visible {
   border-color: var(--accent-primary);
+  outline: none;
 }
 
 .auth-submit-btn {

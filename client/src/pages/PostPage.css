@@ -97,6 +97,13 @@
   border: 1px solid var(--border-color);
   color: var(--text-primary);
   font-size: 0.9rem;
+  transition: border-color 0.15s ease;
+}
+
+.post-page-comment-input:focus,
+.post-page-comment-input:focus-visible {
+  border-color: var(--accent-primary);
+  outline: none;
 }
 
 .post-page-state {

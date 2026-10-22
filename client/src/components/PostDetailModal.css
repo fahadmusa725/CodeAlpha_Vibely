@@ -242,6 +242,11 @@
   border-top: 1px solid var(--border-color);
   padding: 10px 16px;
   flex-shrink: 0;
+  transition: border-color 0.15s ease;
+}
+
+.sticky-comment-form:focus-within {
+  border-top-color: var(--accent-primary);
 }
 
 .reply-indicator {
@@ -275,6 +280,11 @@
   font-size: 0.8125rem;
   color: var(--text-primary);
   padding: 4px 0;
+}
+
+.detail-comment-input:focus,
+.detail-comment-input:focus-visible {
+  outline: none;
 }
 
 .detail-comment-input::placeholder {
