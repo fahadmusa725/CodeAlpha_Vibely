@@ -1,24 +1,29 @@
 :root {
-  --accent-primary: #0369a1;
-  --accent-hover: #025d8f;
-  --accent-light: rgba(3, 105, 161, 0.1);
-  --accent-border: rgba(3, 105, 161, 0.22);
+  --accent-primary: #1d4ed8;
+  --accent-hover: #1e40af;
+  --accent-light: rgba(29, 78, 216, 0.1);
+  --accent-border: rgba(29, 78, 216, 0.22);
+  --accent-secondary: #0284c7;
+  --accent-indigo: #4f46e5;
+  --accent-fg: #f5f8ff;
 
-  --bg-primary: #f4f6fa;
+  --bg-primary: #f8fafc;
   --bg-surface: #ffffff;
   --bg-surface-elevated: #ffffff;
-  --bg-subtle: #edf1f7;
+  --bg-subtle: #f1f5f9;
   --bg-hover: #e2e8f0;
 
   --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-tertiary: #94a3b8;
-  --text-inverse: #ffffff;
+  --text-secondary: #485369;
+  --text-tertiary: #64748b;
+  --text-inverse: #f8fafc;
 
   --danger: #dc2626;
   --danger-light: #fee2e2;
   --success: #16a34a;
   --success-light: #dcfce7;
+  --warning: #d97706;
+  --warning-light: #fef3c7;
 
   --border-color: #e2e8f0;
   --border-subtle: #f1f5f9;
@@ -38,30 +43,40 @@
   --navbar-height: 70px;
   --mobile-nav-height: 60px;
 
-  --font-brand: 'Inter', system-ui, sans-serif;
-  --font-heading: 'Inter', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  --font-brand: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-heading: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: 'Public Sans', system-ui, sans-serif;
 }
 
 [data-theme='dark'] {
-  --bg-primary: #0b0e14;
-  --bg-surface: #141923;
-  --bg-surface-elevated: #1a202c;
-  --bg-subtle: #1e2535;
-  --bg-hover: #263044;
+  --bg-primary: #0b0f19;
+  --bg-surface: #111827;
+  --bg-surface-elevated: #1e293b;
+  --bg-subtle: #1e293b;
+  --bg-hover: #273549;
 
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-tertiary: #64748b;
-  --text-inverse: #0f172a;
+  --text-inverse: #0b0f19;
 
-  --accent-primary: #0ea5e9;
-  --accent-hover: #38bdf8;
-  --accent-light: rgba(14, 165, 233, 0.15);
-  --accent-border: rgba(14, 165, 233, 0.3);
+  --accent-primary: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-light: rgba(59, 130, 246, 0.15);
+  --accent-border: rgba(59, 130, 246, 0.3);
+  --accent-secondary: #38bdf8;
+  --accent-indigo: #818cf8;
+  --accent-fg: #11161f;
 
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-color: #334155;
+  --border-subtle: rgba(51, 65, 85, 0.5);
+
+  --danger: #ef4444;
+  --danger-light: rgba(239, 68, 68, 0.15);
+  --success: #22c55e;
+  --success-light: rgba(34, 197, 94, 0.15);
+  --warning: #f59e0b;
+  --warning-light: rgba(245, 158, 11, 0.15);
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
@@ -170,7 +185,7 @@ img {
 
 .btn-primary {
   background: var(--accent-primary);
-  color: #ffffff;
+  color: var(--accent-fg);
 }
 .btn-primary:hover {
   background: var(--accent-hover);

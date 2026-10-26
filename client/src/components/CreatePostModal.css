@@ -41,6 +41,7 @@
 }
 
 .create-modal-title {
+  font-family: var(--font-heading);
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-primary);
