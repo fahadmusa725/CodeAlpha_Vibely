@@ -384,7 +384,7 @@ const PostDetailModal = ({ post: initialPost, isOpen, onClose, onPostUpdated }) 
 
             {likeAnimating && (
               <div className="heart-pulse-overlay">
-                <FontAwesomeIcon icon={faHeart} style={{ fontSize: 96, color: '#ed4956' }} className="animated-heart" />
+                <FontAwesomeIcon icon={faHeart} style={{ fontSize: 96, color: 'var(--danger)' }} className="animated-heart" />
               </div>
             )}
           </div>
@@ -487,7 +487,7 @@ const PostDetailModal = ({ post: initialPost, isOpen, onClose, onPostUpdated }) 
                     onClick={handleLikeToggle}
                     aria-label="Like"
                   >
-                    <FontAwesomeIcon icon={isLiked ? faHeart : farHeart} style={{ fontSize: 24, color: isLiked ? '#ed4956' : 'currentColor' }} />
+                    <FontAwesomeIcon icon={isLiked ? faHeart : farHeart} style={{ fontSize: 24, color: isLiked ? 'var(--danger)' : 'currentColor' }} />
                   </button>
 
                   <button className="action-btn-icon" aria-label="Comment" onClick={focusComment}>

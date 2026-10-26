@@ -96,7 +96,7 @@
 }
 
 .admin-engagement-item.likes svg {
-  color: #ec4899;
+  color: var(--danger);
 }
 
 .admin-engagement-item.comments svg {

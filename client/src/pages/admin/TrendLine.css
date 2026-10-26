@@ -13,11 +13,11 @@
 }
 
 .admin-trend.up {
-  color: #10b981;
+  color: var(--success);
 }
 
 .admin-trend.down {
-  color: #f43f5e;
+  color: var(--danger);
 }
 
 .admin-stat-note {

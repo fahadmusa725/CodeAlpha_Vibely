@@ -293,7 +293,7 @@
 
 .detail-comment-submit {
   background: transparent;
-  color: #0095f6;
+  color: var(--accent-primary);
   border: none;
   font-weight: 600;
   font-size: 0.8125rem;
@@ -302,7 +302,7 @@
 }
 
 .detail-comment-submit:hover {
-  color: #00376b;
+  color: var(--accent-hover);
 }
 
 .login-to-comment {

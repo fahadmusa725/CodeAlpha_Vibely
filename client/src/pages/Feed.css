@@ -93,11 +93,11 @@
 }
 
 .c-icon.photo-icon {
-  color: #10b981;
+  color: var(--success);
 }
 
 .c-icon.location-icon {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 .posts-container {

@@ -3,12 +3,12 @@ export const EXPORT_PAGE_SIZE = 50;
 export const EXPORT_MAX_PAGES = 20;
 
 export const COLORS = {
-  users: '#7c5cff',
-  posts: '#3b82f6',
-  comments: '#ec4899',
-  stories: '#14b8a6',
-  verified: '#22b8f0',
-  regular: '#7c5cff',
+  users: 'var(--accent-primary)',
+  posts: 'var(--accent-secondary)',
+  comments: 'var(--accent-indigo)',
+  stories: 'var(--success)',
+  verified: 'var(--accent-secondary)',
+  regular: 'var(--accent-primary)',
 };
 
 export const tooltipStyle = {

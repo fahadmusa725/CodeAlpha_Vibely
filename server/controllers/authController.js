@@ -94,7 +94,7 @@ exports.register = async (req, res) => {
 
     const defaultAvatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
       trimmedFullName
-    )}&backgroundColor=0ea5e9&textColor=ffffff`;
+    )}&backgroundColor=1d4ed8&textColor=ffffff`;
 
     const user = await User.create({
       username: trimmedUsername,

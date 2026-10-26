@@ -326,7 +326,7 @@ const PostCard = ({ post: initialPost, onPostDeleted, onPostUpdated, onOpenPostM
 
             {likeAnimating && (
               <div className="heart-pulse-overlay">
-                <FontAwesomeIcon icon={faHeart} style={{ fontSize: 88, color: '#ed4956' }} className="animated-heart" />
+                <FontAwesomeIcon icon={faHeart} style={{ fontSize: 88, color: 'var(--danger)' }} className="animated-heart" />
               </div>
             )}
           </div>
@@ -334,7 +334,7 @@ const PostCard = ({ post: initialPost, onPostDeleted, onPostUpdated, onOpenPostM
 
         <div className="post-stats-row">
           <div className="stats-likes-left" onClick={handleLikeToggle}>
-            <FontAwesomeIcon icon={likesCount > 0 ? faHeart : farHeart} style={{ fontSize: 16, color: likesCount > 0 ? '#ed4956' : 'currentColor' }} />
+            <FontAwesomeIcon icon={likesCount > 0 ? faHeart : farHeart} style={{ fontSize: 16, color: likesCount > 0 ? 'var(--danger)' : 'currentColor' }} />
             <span>{likesCount} {likesCount === 1 ? 'like' : 'likes'}</span>
           </div>
 
@@ -353,7 +353,7 @@ const PostCard = ({ post: initialPost, onPostDeleted, onPostUpdated, onOpenPostM
             className={`post-footer-btn ${isLiked ? 'liked' : ''}`}
             onClick={handleLikeToggle}
           >
-            <FontAwesomeIcon icon={isLiked ? faHeart : farHeart} style={{ fontSize: 18, color: isLiked ? '#ed4956' : 'currentColor' }} />
+            <FontAwesomeIcon icon={isLiked ? faHeart : farHeart} style={{ fontSize: 18, color: isLiked ? 'var(--danger)' : 'currentColor' }} />
             <span>Like</span>
           </button>
 

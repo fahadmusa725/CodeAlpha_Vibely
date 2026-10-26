@@ -31,11 +31,11 @@
 }
 
 .admin-quick-action.shade-2 {
-  background: #0284c7;
+  background: var(--accent-secondary);
 }
 
 .admin-quick-action.shade-3 {
-  background: #075985;
+  background: var(--accent-hover);
 }
 
 .admin-quick-action:hover:not(:disabled) {

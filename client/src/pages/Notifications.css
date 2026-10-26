@@ -169,15 +169,15 @@
 }
 
 .notif-badge-icon.like {
-  background: #ed4956;
+  background: var(--danger);
 }
 
 .notif-badge-icon.follow {
-  background: #6366f1;
+  background: var(--accent-indigo);
 }
 
 .notif-badge-icon.comment {
-  background: #3b82f6;
+  background: var(--accent-primary);
 }
 
 .notif-content {

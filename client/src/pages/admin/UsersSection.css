@@ -158,7 +158,7 @@
 }
 
 .admin-user-avatar.is-verified {
-  box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 3.5px #0095f6;
+  box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 3.5px var(--accent-primary);
 }
 
 .admin-user-info {
@@ -202,8 +202,8 @@
 }
 
 .admin-badge.verified {
-  background: rgba(16, 185, 129, 0.14);
-  color: #10b981;
+  background: var(--success-light);
+  color: var(--success);
 }
 
 .admin-row-actions {

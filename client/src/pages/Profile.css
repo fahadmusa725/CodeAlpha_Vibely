@@ -73,8 +73,8 @@
   position: absolute;
   bottom: 2px;
   right: 2px;
-  background: #0095f6;
-  color: #ffffff;
+  background: var(--accent-primary);
+  color: var(--accent-fg);
   border: 2px solid var(--bg-surface);
   border-radius: 50%;
   width: 28px;
@@ -136,7 +136,7 @@
 }
 
 .link-tag {
-  color: #0095f6;
+  color: var(--accent-primary);
 }
 
 .profile-stats-bar {
@@ -161,7 +161,7 @@
 
 .stat-item-clickable:hover .stat-number,
 .stat-item-clickable:hover .stat-label {
-  color: #0095f6;
+  color: var(--accent-primary);
 }
 
 .stat-number {

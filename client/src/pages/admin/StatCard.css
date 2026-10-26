@@ -1,6 +1,6 @@
 .admin-stat-card {
-  --tone: #7c5cff;
-  --tone-rgb: 124, 92, 255;
+  --tone: var(--accent-indigo);
+  --tone-rgb: 79, 70, 229;
   display: flex;
   flex-direction: column;
   padding: 22px;
@@ -11,23 +11,23 @@
 }
 
 .admin-stat-card.tone-violet {
-  --tone: #7c5cff;
-  --tone-rgb: 124, 92, 255;
+  --tone: var(--accent-indigo);
+  --tone-rgb: 79, 70, 229;
 }
 
 .admin-stat-card.tone-blue {
-  --tone: #3b82f6;
-  --tone-rgb: 59, 130, 246;
+  --tone: var(--accent-primary);
+  --tone-rgb: 29, 78, 216;
 }
 
 .admin-stat-card.tone-pink {
-  --tone: #ec4899;
-  --tone-rgb: 236, 72, 153;
+  --tone: var(--accent-secondary);
+  --tone-rgb: 2, 132, 199;
 }
 
 .admin-stat-card.tone-teal {
-  --tone: #14b8a6;
-  --tone-rgb: 20, 184, 166;
+  --tone: var(--success);
+  --tone-rgb: 22, 163, 74;
 }
 
 .admin-stat-icon {

@@ -331,7 +331,7 @@
 }
 
 .post-footer-btn.liked {
-  color: #ed4956;
+  color: var(--danger);
 }
 
 .postcard-edit-overlay {

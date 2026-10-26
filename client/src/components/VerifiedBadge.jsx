@@ -12,10 +12,10 @@ const VerifiedBadge = ({ size = 14, className = '' }) => {
       style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}
       title="Verified account"
     >
-      <circle cx="12" cy="12" r="10" fill="#0095F6" />
+      <circle cx="12" cy="12" r="10" fill="var(--accent-primary)" />
       <path
         d="M8.5 12.5L10.8 14.8L15.5 9.5"
-        stroke="#FFFFFF"
+        stroke="var(--accent-fg)"
         strokeWidth="2.2"
         strokeLinecap="round"
         strokeLinejoin="round"
