@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowTrendUp, faCircle, faUsers, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faArrowTrendUp, faChevronLeft, faChevronRight, faCircle, faUsers, faXmark } from '@fortawesome/free-solid-svg-icons';
 import VerifiedBadge from './VerifiedBadge';
 import api from '../services/api';
 import './RightSidebar.css';
@@ -26,11 +26,39 @@ const RightSidebar = ({ suggestedUsers = [], onFollowUser }) => {
   const [trendingTags, setTrendingTags] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [loadingContacts, setLoadingContacts] = useState(false);
+  const userListRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [hasOverflow, setHasOverflow] = useState(false);
 
   useEffect(() => {
     fetchTrendingTags();
     if (isAuthenticated) fetchContacts();
   }, [isAuthenticated]);
+
+  const updateScrollState = useCallback(() => {
+    const el = userListRef.current;
+    if (!el) return;
+    const overflow = el.scrollWidth > el.clientWidth + 1;
+    setHasOverflow(overflow);
+    if (!overflow) {
+      setCanScrollLeft(false);
+      setCanScrollRight(false);
+      return;
+    }
+    setCanScrollLeft(el.scrollLeft > 1);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
+  }, []);
+
+  const handleScroll = (direction) => {
+    const el = userListRef.current;
+    if (!el) return;
+    const scrollAmount = 160;
+    el.scrollBy({
+      left: direction === 'next' ? scrollAmount : -scrollAmount,
+      behavior: 'smooth'
+    });
+  };
 
   const fetchTrendingTags = async () => {
     try {
@@ -60,6 +88,21 @@ const RightSidebar = ({ suggestedUsers = [], onFollowUser }) => {
 
   const visibleUsers = suggestedUsers.filter((u) => !dismissedIds.includes(u._id));
 
+  useEffect(() => {
+    updateScrollState();
+    const el = userListRef.current;
+    if (!el) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateScrollState();
+    });
+    resizeObserver.observe(el);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [visibleUsers.length, updateScrollState]);
+
   return (
     <aside className="right-sidebar">
       <div className="rs-card card">
@@ -68,12 +111,40 @@ const RightSidebar = ({ suggestedUsers = [], onFollowUser }) => {
             <FontAwesomeIcon icon={faUsers} style={{ fontSize: 18 }} className="rs-title-icon" />
             <h3>Who to Follow</h3>
           </div>
-          <button className="rs-see-all-btn" onClick={() => navigate('/search')}>
-            See all
-          </button>
+          <div className="rs-header-actions">
+            {hasOverflow && (
+              <div className="rs-slider-controls">
+                <button
+                  type="button"
+                  className="rs-nav-btn"
+                  onClick={() => handleScroll('prev')}
+                  disabled={!canScrollLeft}
+                  aria-label="Previous"
+                >
+                  <FontAwesomeIcon icon={faChevronLeft} style={{ fontSize: 11 }} />
+                </button>
+                <button
+                  type="button"
+                  className="rs-nav-btn"
+                  onClick={() => handleScroll('next')}
+                  disabled={!canScrollRight}
+                  aria-label="Next"
+                >
+                  <FontAwesomeIcon icon={faChevronRight} style={{ fontSize: 11 }} />
+                </button>
+              </div>
+            )}
+            <button className="rs-see-all-btn" onClick={() => navigate('/search')}>
+              See all
+            </button>
+          </div>
         </div>
 
-        <div className="rs-user-list">
+        <div
+          className="rs-user-list"
+          ref={userListRef}
+          onScroll={updateScrollState}
+        >
           {visibleUsers.length > 0 ? (
             visibleUsers.slice(0, 5).map((u) => {
               const mutualText =

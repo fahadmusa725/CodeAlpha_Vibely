@@ -63,13 +63,26 @@
   top: calc(var(--navbar-height, 70px) + 16px);
   max-height: calc(100vh - var(--navbar-height, 70px) - 32px);
   overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  padding: 16px 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+  padding: 16px 6px 16px 0;
 }
 
 .app-right-sidebar::-webkit-scrollbar {
-  display: none;
+  width: 6px;
+}
+
+.app-right-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-right-sidebar::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: var(--radius-full);
+}
+
+.app-right-sidebar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-tertiary);
 }
 
 @media (max-width: 1279px) {
