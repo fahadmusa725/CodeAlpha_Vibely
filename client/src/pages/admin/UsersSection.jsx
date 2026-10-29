@@ -4,6 +4,7 @@ import { faMagnifyingGlass, faXmark, faChevronLeft, faChevronRight, faTrash } fr
 import api from '../../services/api';
 import { getAvatarUrl } from '../../utils/avatar';
 import VerifiedBadge from '../../components/VerifiedBadge';
+import ConfirmDialog from '../../components/ConfirmDialog';
 import EmptyState from './EmptyState';
 import { PAGE_SIZE, formatDate } from './adminUtils';
 import './UsersSection.css';
@@ -16,6 +17,8 @@ const UsersSection = () => {
   const [error, setError] = useState('');
   const [actionError, setActionError] = useState('');
   const [reloadKey, setReloadKey] = useState(0);
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -57,16 +60,24 @@ const UsersSection = () => {
     }
   };
 
-  const deleteUser = async (user) => {
-    if (!window.confirm(`Delete @${user.username}? Their posts, comments, stories and follows will be removed. This cannot be undone.`)) return;
+  const deleteUser = (user) => {
+    setUserToDelete(user);
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return;
     setActionError('');
+    setDeleteLoading(true);
     try {
-      await api.delete(`/admin/users/${user._id}`);
-      setUsers((prev) => prev.filter((item) => item._id !== user._id));
+      await api.delete(`/admin/users/${userToDelete._id}`);
+      setUsers((prev) => prev.filter((item) => item._id !== userToDelete._id));
       setPagination((prev) => ({ ...prev, total: Math.max(0, prev.total - 1) }));
+      setUserToDelete(null);
     } catch (err) {
+      setUserToDelete(null);
       setActionError(err.response?.data?.message || 'Could not delete this account.');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -213,6 +224,22 @@ const UsersSection = () => {
           Next <FontAwesomeIcon icon={faChevronRight} style={{ fontSize: 12 }} />
         </button>
       </div>
+
+      <ConfirmDialog
+        isOpen={Boolean(userToDelete)}
+        title="Delete account"
+        message={
+          userToDelete
+            ? `Delete ${userToDelete.username}? Their posts, comments, stories and follows will be removed. This cannot be undone.`
+            : ''
+        }
+        confirmLabel="Delete account"
+        cancelLabel="Cancel"
+        danger
+        loading={deleteLoading}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setUserToDelete(null)}
+      />
     </div>
   );
 };

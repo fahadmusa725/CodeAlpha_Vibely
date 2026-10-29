@@ -5,6 +5,7 @@ import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { getAvatarUrl } from '../../utils/avatar';
+import ConfirmDialog from '../ConfirmDialog';
 import './StoryViewerModal.css';
 
 const StoryViewerModal = ({ groups, initialGroupIndex, onClose }) => {
@@ -12,6 +13,8 @@ const StoryViewerModal = ({ groups, initialGroupIndex, onClose }) => {
   const navigate = useNavigate();
   const [groupIndex, setGroupIndex] = useState(initialGroupIndex);
   const [storyIndex, setStoryIndex] = useState(0);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const currentGroup = groups[groupIndex];
   const currentStory = currentGroup?.stories[storyIndex];
@@ -39,7 +42,7 @@ const StoryViewerModal = ({ groups, initialGroupIndex, onClose }) => {
   }, [currentStory]);
 
   useEffect(() => {
-    if (!currentStory) return;
+    if (!currentStory || showDeleteConfirm) return;
     const timer = setTimeout(() => {
       if (storyIndex < currentGroup.stories.length - 1) {
         setStoryIndex((prev) => prev + 1);
@@ -51,7 +54,7 @@ const StoryViewerModal = ({ groups, initialGroupIndex, onClose }) => {
       }
     }, 5000);
     return () => clearTimeout(timer);
-  }, [currentGroup, currentStory, groupIndex, storyIndex, groups, closeViewer]);
+  }, [currentGroup, currentStory, groupIndex, storyIndex, groups, closeViewer, showDeleteConfirm]);
 
   if (!currentGroup || !currentStory) return null;
 
@@ -77,13 +80,21 @@ const StoryViewerModal = ({ groups, initialGroupIndex, onClose }) => {
     }
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm('Delete this story?')) return;
+  const handleDelete = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setDeleteLoading(true);
     try {
       await api.delete(`/stories/${currentStory._id}`);
+      setShowDeleteConfirm(false);
       closeViewer();
     } catch {
+      setShowDeleteConfirm(false);
       // deletion failed; modal stays open so user can retry
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -129,6 +140,18 @@ const StoryViewerModal = ({ groups, initialGroupIndex, onClose }) => {
           <div className="story-nav-area right" onClick={handleNext} />
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Delete story"
+        message="Delete this story? This cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        danger
+        loading={deleteLoading}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </div>
   );
 };

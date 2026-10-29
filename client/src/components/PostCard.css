@@ -17,7 +17,7 @@
   left: 50%;
   transform: translateX(-50%);
   background: var(--accent-primary);
-  color: #ffffff;
+  color: var(--text-inverse);
   padding: 8px 16px;
   border-radius: var(--radius-full);
   font-size: 0.825rem;
@@ -28,6 +28,11 @@
   box-shadow: var(--shadow-md);
   z-index: 50;
   animation: toastFade 0.2s ease-out;
+}
+
+.postcard-toast.danger {
+  background: var(--danger);
+  color: var(--text-inverse);
 }
 
 @keyframes toastFade {

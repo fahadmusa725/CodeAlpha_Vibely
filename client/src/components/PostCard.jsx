@@ -5,6 +5,7 @@ import { faBookmark, faCheck, faChevronLeft, faChevronRight, faEllipsis, faHeart
 import { faBookmark as farBookmark, faComment as farComment, faHeart as farHeart } from '@fortawesome/free-regular-svg-icons';
 import { useAuth } from '../context/AuthContext';
 import VerifiedBadge from './VerifiedBadge';
+import ConfirmDialog from './ConfirmDialog';
 import { formatRelativeTime, formatFullDateTooltip } from '../utils/formatTime';
 import api from '../services/api';
 import './PostCard.css';
@@ -43,6 +44,9 @@ const PostCard = ({ post: initialPost, onPostDeleted, onPostUpdated, onOpenPostM
   const [showOptions, setShowOptions] = useState(false);
   const [likeAnimating, setLikeAnimating] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('info');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [editCaption, setEditCaption] = useState('');
@@ -138,6 +142,7 @@ const PostCard = ({ post: initialPost, onPostDeleted, onPostUpdated, onOpenPostM
       if (res.data.success) {
         setIsSaved(res.data.isSaved);
         if (onPostUpdated) onPostUpdated({ ...post, isLiked, likesCount, isSaved: res.data.isSaved });
+        setToastType('info');
         setToastMessage(res.data.isSaved ? 'Post saved' : 'Removed from saved');
         setTimeout(() => setToastMessage(''), 3000);
       }
@@ -146,20 +151,29 @@ const PostCard = ({ post: initialPost, onPostDeleted, onPostUpdated, onOpenPostM
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     setShowOptions(false);
-    if (window.confirm('Are you sure you want to delete this post?')) {
-      try {
-        await api.delete(`/posts/${post._id}`);
-        if (isAuthor) {
-          updateUser({ postsCount: Math.max(0, (user.postsCount || 0) - 1) });
-        }
-        if (onPostDeleted) {
-          onPostDeleted(post._id);
-        }
-      } catch (err) {
-        alert(err.response?.data?.message || 'Failed to delete post');
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setDeleteLoading(true);
+    try {
+      await api.delete(`/posts/${post._id}`);
+      if (isAuthor) {
+        updateUser({ postsCount: Math.max(0, (user.postsCount || 0) - 1) });
       }
+      setShowDeleteConfirm(false);
+      if (onPostDeleted) {
+        onPostDeleted(post._id);
+      }
+    } catch (err) {
+      setShowDeleteConfirm(false);
+      setToastType('danger');
+      setToastMessage(err.response?.data?.message || 'Failed to delete post');
+      setTimeout(() => setToastMessage(''), 3000);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -177,6 +191,7 @@ const PostCard = ({ post: initialPost, onPostDeleted, onPostUpdated, onOpenPostM
     if (navigator.clipboard) {
       navigator.clipboard.writeText(postUrl);
     }
+    setToastType('info');
     setToastMessage('Link copied to clipboard.');
     setTimeout(() => setToastMessage(''), 3000);
   };
@@ -221,8 +236,8 @@ const PostCard = ({ post: initialPost, onPostDeleted, onPostUpdated, onOpenPostM
     <>
       <article className="post-card card">
         {toastMessage && (
-          <div className="postcard-toast">
-            <FontAwesomeIcon icon={faCheck} style={{ fontSize: 16 }} />
+          <div className={`postcard-toast ${toastType === 'danger' ? 'danger' : ''}`}>
+            {toastType !== 'danger' && <FontAwesomeIcon icon={faCheck} style={{ fontSize: 16 }} />}
             <span>{toastMessage}</span>
           </div>
         )}
@@ -439,6 +454,18 @@ const PostCard = ({ post: initialPost, onPostDeleted, onPostUpdated, onOpenPostM
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Delete post"
+        message="Are you sure you want to delete this post? This cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        danger
+        loading={deleteLoading}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </>
   );
 };

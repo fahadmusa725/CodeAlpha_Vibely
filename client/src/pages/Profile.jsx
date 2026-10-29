@@ -30,6 +30,8 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
   const [editWebsite, setEditWebsite] = useState('');
   const [editLocation, setEditLocation] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
+  const [profileError, setProfileError] = useState('');
+  const [editProfileError, setEditProfileError] = useState('');
 
   const avatarInputRef = useRef(null);
   const coverInputRef = useRef(null);
@@ -142,6 +144,7 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    setProfileError('');
     const formData = new FormData();
     formData.append('image', file);
     formData.append('type', type);
@@ -160,13 +163,14 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
         }
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Media upload failed');
+      setProfileError(err.response?.data?.message || 'Media upload failed');
     }
   };
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     setSavingProfile(true);
+    setEditProfileError('');
     try {
       const res = await api.put('/users/profile', {
         fullName: editFullName,
@@ -191,7 +195,7 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
         setShowEditModal(false);
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Update failed');
+      setEditProfileError(err.response?.data?.message || 'Update failed');
     } finally {
       setSavingProfile(false);
     }
@@ -223,6 +227,7 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
 
   return (
     <div className="profile-container">
+      {profileError && <div className="profile-action-error">{profileError}</div>}
       <div className="profile-cover-wrapper">
         {profileUser.coverPhoto ? (
           <img
@@ -478,6 +483,7 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
             onClick={(e) => e.stopPropagation()}
           >
             <h3>Edit Profile</h3>
+            {editProfileError && <div className="profile-action-error">{editProfileError}</div>}
             <form onSubmit={handleSaveProfile} className="edit-profile-form">
               <div className="edit-field">
                 <label>Full Name</label>
