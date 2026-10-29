@@ -36,6 +36,15 @@ const seedRichData = async () => {
     const seededUserIds = existingSeededUsers.map((u) => u._id);
 
     if (seededUserIds.length > 0) {
+      await User.updateMany(
+        {},
+        {
+          $pull: {
+            followers: { $in: seededUserIds },
+            following: { $in: seededUserIds },
+          },
+        }
+      );
       await Post.deleteMany({ author: { $in: seededUserIds } });
       await Comment.deleteMany({ author: { $in: seededUserIds } });
       await Story.deleteMany({ user: { $in: seededUserIds } });
