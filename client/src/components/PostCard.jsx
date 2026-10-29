@@ -138,6 +138,8 @@ const PostCard = ({ post: initialPost, onPostDeleted, onPostUpdated, onOpenPostM
       if (res.data.success) {
         setIsSaved(res.data.isSaved);
         if (onPostUpdated) onPostUpdated({ ...post, isLiked, likesCount, isSaved: res.data.isSaved });
+        setToastMessage(res.data.isSaved ? 'Post saved' : 'Removed from saved');
+        setTimeout(() => setToastMessage(''), 3000);
       }
     } catch {
       setIsSaved(!nextState);

@@ -142,6 +142,8 @@ const PostDetailModal = ({ post: initialPost, isOpen, onClose, onPostUpdated }) 
     try {
       const res = await api.post(`/posts/${post._id}/save`);
       reportChange({ isSaved: res.data.isSaved });
+      setToastMessage(res.data.isSaved ? 'Post saved' : 'Removed from saved');
+      setTimeout(() => setToastMessage(''), 3000);
     } catch {
       setIsSaved(!nextState);
     }
