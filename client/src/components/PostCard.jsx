@@ -31,7 +31,7 @@ const renderCaption = (text, navigate) => {
 
 
 const PostCard = ({ post: initialPost, onPostDeleted, onPostUpdated, onOpenPostModal }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, updateUser } = useAuth();
   const navigate = useNavigate();
 
   const [post, setPost] = useState(initialPost);
@@ -151,6 +151,9 @@ const PostCard = ({ post: initialPost, onPostDeleted, onPostUpdated, onOpenPostM
     if (window.confirm('Are you sure you want to delete this post?')) {
       try {
         await api.delete(`/posts/${post._id}`);
+        if (isAuthor) {
+          updateUser({ postsCount: Math.max(0, (user.postsCount || 0) - 1) });
+        }
         if (onPostDeleted) {
           onPostDeleted(post._id);
         }

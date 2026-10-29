@@ -328,8 +328,8 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
 
           <div className="profile-stats-bar">
             <div className="stat-item">
-              <span className="stat-number">{profileUser.postsCount || posts.length}</span>
-              <span className="stat-label">{(profileUser.postsCount || posts.length) === 1 ? 'post' : 'posts'}</span>
+              <span className="stat-number">{profileUser.postsCount ?? posts.length}</span>
+              <span className="stat-label">{(profileUser.postsCount ?? posts.length) === 1 ? 'post' : 'posts'}</span>
             </div>
             <div
               className="stat-item stat-item-clickable"

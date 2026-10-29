@@ -6,7 +6,7 @@ import api from '../services/api';
 import './CreatePostModal.css';
 
 const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [step, setStep] = useState(1);
   const [images, setImages] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
@@ -104,6 +104,7 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
       });
 
       if (res.data.success) {
+        updateUser({ postsCount: Math.max(0, (user.postsCount || 0) + 1) });
         if (onPostCreated) {
           onPostCreated(res.data.data);
         }
