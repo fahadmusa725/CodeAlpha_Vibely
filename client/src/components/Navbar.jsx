@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faCompass, faFire, faGear, faHouse, faMagnifyingGlass, faMoon, faRightFromBracket, faSun, faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { faBell as farBell, faBookmark as farBookmark } from '@fortawesome/free-regular-svg-icons';
@@ -11,10 +11,21 @@ const Navbar = () => {
   const { user, logout, isAuthenticated, unreadCount } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    setIsDropdownOpen(false);
+    if (location.pathname === '/search') {
+      const q = new URLSearchParams(location.search).get('q') || '';
+      setSearchQuery(q);
+    } else {
+      setSearchQuery('');
+    }
+  }, [location.pathname, location.search]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
