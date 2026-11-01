@@ -1,8 +1,53 @@
 const Story = require('../models/Story');
 const User = require('../models/User');
-const { uploadStream } = require('../config/cloudinary');
+const { cloudinary, uploadStream } = require('../config/cloudinary');
 
 const STORY_TTL_HOURS = 24;
+
+exports.getUploadSignature = async (req, res) => {
+  try {
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+    const apiKey = process.env.CLOUDINARY_API_KEY;
+    const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+    const hasValidCloudinary =
+      cloudName &&
+      cloudName !== 'demo' &&
+      apiKey &&
+      apiKey !== '123456789012345' &&
+      apiSecret;
+
+    if (!hasValidCloudinary) {
+      return res.status(200).json({
+        success: true,
+        directUpload: false,
+      });
+    }
+
+    const timestamp = Math.round(Date.now() / 1000);
+    const folder = 'vibely/stories';
+
+    const signature = cloudinary.utils.api_sign_request(
+      { folder, timestamp },
+      apiSecret
+    );
+
+    return res.status(200).json({
+      success: true,
+      directUpload: true,
+      cloudName,
+      apiKey,
+      timestamp,
+      folder,
+      signature,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Server error generating upload signature',
+    });
+  }
+};
 
 const groupStoriesByUser = (stories, currentUserId) => {
   const map = new Map();
@@ -43,21 +88,58 @@ const groupStoriesByUser = (stories, currentUserId) => {
 
 exports.createStory = async (req, res) => {
   try {
-    if (!req.file) {
+    let mediaUrl;
+    let mediaType = 'image';
+
+    if (req.body && req.body.mediaUrl) {
+      mediaUrl = req.body.mediaUrl;
+      if (req.body.mediaType) {
+        mediaType = req.body.mediaType;
+      }
+
+      if (typeof mediaUrl !== 'string' || !mediaType) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid story media payload.',
+        });
+      }
+
+      const allowedTypes = ['image'];
+      if (!allowedTypes.includes(mediaType)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Unsupported story media type.',
+        });
+      }
+
+      const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+      const expectedPrefix = `https://res.cloudinary.com/${cloudName}/`;
+      if (
+        !cloudName ||
+        !mediaUrl.startsWith(expectedPrefix) ||
+        !mediaUrl.includes('/vibely/stories/')
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid story media URL.',
+        });
+      }
+    } else if (req.file) {
+      const uploaded = await uploadStream(req.file.buffer, 'vibely/stories');
+      mediaUrl = uploaded.url;
+    } else {
       return res.status(400).json({
         success: false,
         message: 'Please provide an image for your story.',
       });
     }
 
-    const uploaded = await uploadStream(req.file.buffer, 'vibely_stories');
-
     const expiresAt = new Date(Date.now() + STORY_TTL_HOURS * 60 * 60 * 1000);
 
     const story = await Story.create({
       user: req.user._id,
-      mediaUrl: uploaded.url,
-      mediaType: 'image',
+      mediaUrl,
+      mediaType,
       expiresAt,
     });
 
@@ -72,7 +154,6 @@ exports.createStory = async (req, res) => {
       data: populated,
     });
   } catch (error) {
-    console.error('createStory error:', error);
     return res.status(500).json({
       success: false,
       message: 'Server error creating story',
