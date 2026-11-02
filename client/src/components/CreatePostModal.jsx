@@ -190,17 +190,18 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
                 <div className="dropzone-icon-ring">
                   <FontAwesomeIcon icon={faImage} style={{ fontSize: 48, color: 'var(--accent-primary)' }} />
                 </div>
-                <h4>Drag photos here</h4>
-                <p>Support JPG, PNG, WEBP up to 10MB each</p>
+                <h4>Add photos</h4>
+                <span className="dropzone-drag-hint">or drag them here</span>
+                <p>JPG, PNG or WEBP, up to 10MB each</p>
                 <button
                   type="button"
-                  className="btn btn-primary select-computer-btn"
+                  className="btn btn-primary select-photos-btn"
                   onClick={(e) => {
                     e.stopPropagation();
                     fileInputRef.current?.click();
                   }}
                 >
-                  Select from computer
+                  Select photos
                 </button>
               </div>
             ) : (

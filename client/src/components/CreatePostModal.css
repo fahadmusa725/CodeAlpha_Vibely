@@ -109,11 +109,25 @@
   color: var(--text-primary);
 }
 
+.dropzone-drag-hint {
+  display: none;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: -6px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dropzone-drag-hint {
+    display: inline-block;
+  }
+}
+
 .create-dropzone p {
   font-size: 0.825rem;
   color: var(--text-tertiary);
 }
 
+.select-photos-btn,
 .select-computer-btn {
   margin-top: 10px;
   padding: 8px 18px;
