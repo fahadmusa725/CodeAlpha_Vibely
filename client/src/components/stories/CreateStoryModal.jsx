@@ -60,7 +60,7 @@ const CreateStoryModal = ({ onClose, onStoryCreated }) => {
     setError('');
 
     try {
-      const sigRes = await api.get('/stories/upload-signature');
+      const sigRes = await api.get('/uploads/signature?purpose=story');
       const sigData = sigRes.data;
 
       if (sigData.success && sigData.directUpload) {
@@ -69,6 +69,9 @@ const CreateStoryModal = ({ onClose, onStoryCreated }) => {
         formData.append('api_key', sigData.apiKey);
         formData.append('timestamp', sigData.timestamp);
         formData.append('folder', sigData.folder);
+        if (sigData.allowedFormats) {
+          formData.append('allowed_formats', sigData.allowedFormats);
+        }
         formData.append('signature', sigData.signature);
 
         const uploadUrl = `https://api.cloudinary.com/v1_1/${sigData.cloudName}/auto/upload`;

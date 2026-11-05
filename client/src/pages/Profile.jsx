@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera, faComment, faHeart, faLayerGroup, faLink, faLocationDot, faPen, faTableCellsLarge } from '@fortawesome/free-solid-svg-icons';
@@ -8,6 +9,9 @@ import VerifiedBadge from '../components/VerifiedBadge';
 import api from '../services/api';
 import { getAvatarUrl } from '../utils/avatar';
 import './Profile.css';
+
+const ALLOWED_MEDIA_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_MEDIA_SIZE = 10 * 1024 * 1024;
 
 const Profile = ({ onOpenCreateModal, refreshKey }) => {
   const { username } = useParams();
@@ -144,26 +148,92 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    if (!ALLOWED_MEDIA_TYPES.includes(file.type)) {
+      setProfileError('Only JPG, PNG, and WEBP images are allowed.');
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > MAX_MEDIA_SIZE) {
+      setProfileError('Image must be less than 10MB.');
+      e.target.value = '';
+      return;
+    }
+
     setProfileError('');
-    const formData = new FormData();
-    formData.append('image', file);
-    formData.append('type', type);
 
     try {
-      const res = await api.put('/users/media', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      if (res.data.success) {
-        if (type === 'coverPhoto') {
-          setProfileUser((prev) => ({ ...prev, coverPhoto: res.data.data.coverPhoto }));
-          updateUser({ coverPhoto: res.data.data.coverPhoto });
-        } else {
-          setProfileUser((prev) => ({ ...prev, avatar: res.data.data.avatar }));
-          updateUser({ avatar: res.data.data.avatar });
+      const purpose = type === 'coverPhoto' ? 'cover' : 'avatar';
+      const sigRes = await api.get(`/uploads/signature?purpose=${purpose}`);
+      const sigData = sigRes.data;
+
+      if (sigData.success && sigData.directUpload) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('api_key', sigData.apiKey);
+        formData.append('timestamp', sigData.timestamp);
+        formData.append('folder', sigData.folder);
+        if (sigData.allowedFormats) {
+          formData.append('allowed_formats', sigData.allowedFormats);
+        }
+        formData.append('signature', sigData.signature);
+
+        const uploadUrl = `https://api.cloudinary.com/v1_1/${sigData.cloudName}/auto/upload`;
+
+        let cldRes;
+        try {
+          cldRes = await axios.post(uploadUrl, formData);
+        } catch (cldErr) {
+          if (!cldErr.response) {
+            setProfileError('Network error uploading to Cloudinary. Please check your connection.');
+          } else {
+            setProfileError(cldErr.response.data?.error?.message || 'Failed to upload media to Cloudinary.');
+          }
+          e.target.value = '';
+          return;
+        }
+
+        const res = await api.put('/users/media', {
+          type,
+          url: cldRes.data.secure_url,
+          public_id: cldRes.data.public_id,
+        });
+
+        if (res.data.success) {
+          if (type === 'coverPhoto') {
+            setProfileUser((prev) => ({ ...prev, coverPhoto: res.data.data.coverPhoto }));
+            updateUser({ coverPhoto: res.data.data.coverPhoto });
+          } else {
+            setProfileUser((prev) => ({ ...prev, avatar: res.data.data.avatar }));
+            updateUser({ avatar: res.data.data.avatar });
+          }
+        }
+      } else {
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('type', type);
+
+        const res = await api.put('/users/media', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        if (res.data.success) {
+          if (type === 'coverPhoto') {
+            setProfileUser((prev) => ({ ...prev, coverPhoto: res.data.data.coverPhoto }));
+            updateUser({ coverPhoto: res.data.data.coverPhoto });
+          } else {
+            setProfileUser((prev) => ({ ...prev, avatar: res.data.data.avatar }));
+            updateUser({ avatar: res.data.data.avatar });
+          }
         }
       }
     } catch (err) {
-      setProfileError(err.response?.data?.message || 'Media upload failed');
+      if (!err.response) {
+        setProfileError('Network failure. Please check your connection.');
+      } else {
+        setProfileError(err.response?.data?.message || 'Media upload failed');
+      }
+    } finally {
+      e.target.value = '';
     }
   };
 
@@ -249,7 +319,7 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
           type="file"
           ref={coverInputRef}
           onChange={(e) => handleMediaUpload(e, 'coverPhoto')}
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp"
           style={{ display: 'none' }}
         />
       </div>
@@ -277,7 +347,7 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
               type="file"
               ref={avatarInputRef}
               onChange={(e) => handleMediaUpload(e, 'avatar')}
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
               style={{ display: 'none' }}
             />
           </div>

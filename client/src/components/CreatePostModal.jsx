@@ -1,9 +1,13 @@
 import React, { useState, useRef } from 'react';
+import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faChevronLeft, faChevronRight, faGlobe, faHashtag, faImage, faLocationDot, faSpinner, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import './CreatePostModal.css';
+
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
   const { user, updateUser } = useAuth();
@@ -16,6 +20,7 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
   const [location, setLocation] = useState('');
   const [tags, setTags] = useState('');
   const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState('');
 
   const [dragActive, setDragActive] = useState(false);
@@ -27,20 +32,25 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
   const addFiles = (files) => {
     if (files.length === 0) return;
 
-    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
-    if (imageFiles.length === 0) {
-      setError('Only image files can be added.');
-      return;
+    for (const file of files) {
+      if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+        setError('Only JPG, PNG, and WEBP images are allowed.');
+        return;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        setError('Each image must be less than 10MB.');
+        return;
+      }
     }
 
-    if (images.length + imageFiles.length > 10) {
+    if (images.length + files.length > 10) {
       setError('You can upload a maximum of 10 images per post.');
       return;
     }
 
     setError('');
-    setImages([...images, ...imageFiles]);
-    setPreviewUrls((prev) => [...prev, ...imageFiles.map((file) => URL.createObjectURL(file))]);
+    setImages([...images, ...files]);
+    setPreviewUrls((prev) => [...prev, ...files.map((file) => URL.createObjectURL(file))]);
   };
 
   const handleImageSelect = (e) => {
@@ -86,34 +96,117 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
     }
 
     setLoading(true);
+    setUploadProgress(0);
     setError('');
 
     try {
-      const formData = new FormData();
-      images.forEach((img) => {
-        formData.append('images', img);
-      });
-      formData.append('caption', caption);
-      formData.append('location', location);
-      formData.append('tags', tags);
+      const sigRes = await api.get('/uploads/signature?purpose=post');
+      const sigData = sigRes.data;
 
-      const res = await api.post('/posts', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let postPayload;
 
-      if (res.data.success) {
-        updateUser({ postsCount: Math.max(0, (user.postsCount || 0) + 1) });
-        if (onPostCreated) {
-          onPostCreated(res.data.data);
+      if (sigData.success && sigData.directUpload) {
+        const uploadUrl = `https://api.cloudinary.com/v1_1/${sigData.cloudName}/auto/upload`;
+        const totalFiles = images.length;
+        const progressPerFile = new Array(totalFiles).fill(0);
+
+        const uploadPromises = images.map((imgFile, index) => {
+          const formData = new FormData();
+          formData.append('file', imgFile);
+          formData.append('api_key', sigData.apiKey);
+          formData.append('timestamp', sigData.timestamp);
+          formData.append('folder', sigData.folder);
+          if (sigData.allowedFormats) {
+            formData.append('allowed_formats', sigData.allowedFormats);
+          }
+          formData.append('signature', sigData.signature);
+
+          return axios.post(uploadUrl, formData, {
+            onUploadProgress: (progressEvent) => {
+              if (progressEvent.total) {
+                progressPerFile[index] = progressEvent.loaded / progressEvent.total;
+                const totalProgress = Math.round(
+                  (progressPerFile.reduce((acc, curr) => acc + curr, 0) / totalFiles) * 100
+                );
+                setUploadProgress(totalProgress);
+              }
+            },
+          });
+        });
+
+        let uploadResponses;
+        try {
+          uploadResponses = await Promise.all(uploadPromises);
+        } catch (cldErr) {
+          if (!cldErr.response) {
+            setError('Network error uploading to Cloudinary. Please check your connection.');
+          } else {
+            setError(cldErr.response.data?.error?.message || 'Failed to upload images to Cloudinary.');
+          }
+          setLoading(false);
+          setUploadProgress(0);
+          return;
         }
-        handleClose();
+
+        const uploadedImages = uploadResponses.map((res) => ({
+          url: res.data.secure_url,
+          public_id: res.data.public_id,
+        }));
+
+        postPayload = {
+          caption,
+          location,
+          tags,
+          images: uploadedImages,
+        };
+
+        const res = await api.post('/posts', postPayload);
+
+        if (res.data.success) {
+          updateUser({ postsCount: Math.max(0, (user.postsCount || 0) + 1) });
+          if (onPostCreated) {
+            onPostCreated(res.data.data);
+          }
+          handleClose();
+        }
+      } else {
+        const formData = new FormData();
+        images.forEach((img) => {
+          formData.append('images', img);
+        });
+        formData.append('caption', caption);
+        formData.append('location', location);
+        formData.append('tags', tags);
+
+        const res = await api.post('/posts', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          onUploadProgress: (progressEvent) => {
+            if (progressEvent.total) {
+              const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              setUploadProgress(percent);
+            }
+          },
+        });
+
+        if (res.data.success) {
+          updateUser({ postsCount: Math.max(0, (user.postsCount || 0) + 1) });
+          if (onPostCreated) {
+            onPostCreated(res.data.data);
+          }
+          handleClose();
+        }
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create post. Please try again.');
+      if (!err.response) {
+        setError('Network failure. Please check your connection.');
+      } else {
+        setError(err.response?.data?.message || 'Failed to create post. Please try again.');
+      }
     } finally {
       setLoading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -174,6 +267,18 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
         </div>
 
         {error && <div className="create-modal-error">{error}</div>}
+
+        {loading && uploadProgress > 0 && (
+          <div className="create-post-progress-wrapper">
+            <div className="create-post-progress-bar-bg">
+              <div
+                className="create-post-progress-bar-fill"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+            <span className="create-post-progress-text">{uploadProgress}%</span>
+          </div>
+        )}
 
         <div
           className={`create-modal-body ${dragActive ? 'drag-active' : ''}`}
@@ -387,7 +492,7 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
             ref={fileInputRef}
             onChange={handleImageSelect}
             multiple
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp"
             style={{ display: 'none' }}
           />
         </div>

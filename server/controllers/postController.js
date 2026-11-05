@@ -27,22 +27,74 @@ exports.createPost = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Location must be a string' });
     }
 
-    if (!req.files || req.files.length === 0) {
+    let images = [];
+
+    if (req.body && req.body.images) {
+      let rawImages = req.body.images;
+      if (typeof rawImages === 'string') {
+        try {
+          rawImages = JSON.parse(rawImages);
+        } catch {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid images payload',
+          });
+        }
+      }
+
+      if (!Array.isArray(rawImages) || rawImages.length === 0 || rawImages.length > 10) {
+        return res.status(400).json({
+          success: false,
+          message: 'Post must contain between 1 and 10 images',
+        });
+      }
+
+      const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+      const expectedPrefix = `https://res.cloudinary.com/${cloudName}/`;
+
+      for (const img of rawImages) {
+        if (
+          !img ||
+          typeof img.url !== 'string' ||
+          typeof img.public_id !== 'string' ||
+          !cloudName ||
+          !img.url.startsWith(expectedPrefix) ||
+          !img.url.includes('/vibely_posts/') ||
+          !img.public_id.startsWith('vibely_posts/')
+        ) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid image URL or public_id',
+          });
+        }
+        images.push({
+          url: img.url,
+          public_id: img.public_id,
+        });
+      }
+    } else if (req.files && req.files.length > 0) {
+      if (req.files.length > 10) {
+        return res.status(400).json({
+          success: false,
+          message: 'Post cannot have more than 10 images',
+        });
+      }
+
+      const uploadPromises = req.files.map((file) =>
+        uploadStream(file.buffer, 'vibely_posts')
+      );
+      const uploadedImages = await Promise.all(uploadPromises);
+
+      images = uploadedImages.map((img) => ({
+        url: img.url,
+        public_id: img.public_id,
+      }));
+    } else {
       return res.status(400).json({
         success: false,
         message: 'Please provide at least one image for your post',
       });
     }
-
-    const uploadPromises = req.files.map((file) =>
-      uploadStream(file.buffer, 'vibely_posts')
-    );
-    const uploadedImages = await Promise.all(uploadPromises);
-
-    const images = uploadedImages.map((img) => ({
-      url: img.url,
-      public_id: img.public_id,
-    }));
 
     let parsedTags = [];
     if (tags) {

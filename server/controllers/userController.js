@@ -154,21 +154,55 @@ exports.updateUserMedia = async (req, res) => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    const { type } = req.body;
+    const { type, url, public_id } = req.body;
 
-    if (!req.file) {
+    if (!type || !['avatar', 'coverPhoto'].includes(type)) {
       return res.status(400).json({
         success: false,
-        message: 'No image file uploaded',
+        message: 'Invalid media type. Must be avatar or coverPhoto',
       });
     }
 
-    const uploadResult = await uploadStream(req.file.buffer, 'vibely_profiles');
+    let mediaUrl;
+
+    if (url) {
+      if (typeof url !== 'string' || typeof public_id !== 'string') {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid media URL or public_id',
+        });
+      }
+
+      const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+      const expectedPrefix = `https://res.cloudinary.com/${cloudName}/`;
+
+      if (
+        !cloudName ||
+        !url.startsWith(expectedPrefix) ||
+        !url.includes('/vibely_profiles/') ||
+        !public_id.startsWith('vibely_profiles/')
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid media URL or public_id',
+        });
+      }
+
+      mediaUrl = url;
+    } else if (req.file) {
+      const uploadResult = await uploadStream(req.file.buffer, 'vibely_profiles');
+      mediaUrl = uploadResult.url;
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'No image file or URL provided',
+      });
+    }
 
     if (type === 'coverPhoto') {
-      user.coverPhoto = uploadResult.url;
+      user.coverPhoto = mediaUrl;
     } else {
-      user.avatar = uploadResult.url;
+      user.avatar = mediaUrl;
     }
 
     await user.save();

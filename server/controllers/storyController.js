@@ -1,53 +1,8 @@
 const Story = require('../models/Story');
 const User = require('../models/User');
-const { cloudinary, uploadStream } = require('../config/cloudinary');
+const { uploadStream } = require('../config/cloudinary');
 
 const STORY_TTL_HOURS = 24;
-
-exports.getUploadSignature = async (req, res) => {
-  try {
-    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    const apiKey = process.env.CLOUDINARY_API_KEY;
-    const apiSecret = process.env.CLOUDINARY_API_SECRET;
-
-    const hasValidCloudinary =
-      cloudName &&
-      cloudName !== 'demo' &&
-      apiKey &&
-      apiKey !== '123456789012345' &&
-      apiSecret;
-
-    if (!hasValidCloudinary) {
-      return res.status(200).json({
-        success: true,
-        directUpload: false,
-      });
-    }
-
-    const timestamp = Math.round(Date.now() / 1000);
-    const folder = 'vibely/stories';
-
-    const signature = cloudinary.utils.api_sign_request(
-      { folder, timestamp },
-      apiSecret
-    );
-
-    return res.status(200).json({
-      success: true,
-      directUpload: true,
-      cloudName,
-      apiKey,
-      timestamp,
-      folder,
-      signature,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'Server error generating upload signature',
-    });
-  }
-};
 
 const groupStoriesByUser = (stories, currentUserId) => {
   const map = new Map();
