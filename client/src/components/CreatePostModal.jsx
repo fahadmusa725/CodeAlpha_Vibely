@@ -15,7 +15,6 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
   const [images, setImages] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
   const [currentPreviewIdx, setCurrentPreviewIdx] = useState(0);
-  const [aspectRatio, setAspectRatio] = useState('4/5');
   const [caption, setCaption] = useState('');
   const [location, setLocation] = useState('');
   const [tags, setTags] = useState('');
@@ -26,6 +25,8 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
   const locationInputRef = useRef(null);
+  const textareaRef = useRef(null);
+  const mobileTextareaRef = useRef(null);
 
   if (!isOpen) return null;
 
@@ -223,15 +224,40 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
     onClose();
   };
 
+  const handleCaptionInput = (e, targetRef) => {
+    setCaption(e.target.value);
+    if (targetRef && targetRef.current) {
+      targetRef.current.style.height = 'auto';
+      targetRef.current.style.height = `${targetRef.current.scrollHeight}px`;
+    }
+  };
+
   return (
     <div className="modal-overlay create-modal-overlay" onClick={handleClose}>
       <div
         className={`create-modal-container ${step === 2 ? 'step-two-expanded' : ''}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="create-modal-header">
+        {/* Mobile Header (max-width 640px) */}
+        <div className="create-modal-header mobile-header-only">
+          <button className="icon-btn-ghost mobile-close-btn" onClick={handleClose} aria-label="Close">
+            <FontAwesomeIcon icon={faXmark} style={{ fontSize: 20 }} />
+          </button>
+          <h3 className="create-modal-title">Create post</h3>
+          <button
+            type="button"
+            className="mobile-header-post-btn"
+            onClick={handleSubmit}
+            disabled={images.length === 0 || loading}
+          >
+            {loading ? <FontAwesomeIcon icon={faSpinner} className="animate-spin" style={{ fontSize: 16 }} /> : 'Post'}
+          </button>
+        </div>
+
+        {/* Desktop Header (> 640px) */}
+        <div className="create-modal-header desktop-header-only">
           {step === 2 ? (
-            <button className="icon-btn-ghost back-step-btn" onClick={() => setStep(1)}>
+            <button className="icon-btn-ghost back-step-btn" onClick={() => setStep(1)} aria-label="Back">
               <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize: 20 }} />
             </button>
           ) : (
@@ -254,13 +280,13 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
               <button
                 className="step-share-btn"
                 onClick={handleSubmit}
-                disabled={loading || (!caption.trim() && previewUrls.length === 0)}
+                disabled={loading || images.length === 0}
               >
                 {loading ? <FontAwesomeIcon icon={faSpinner} className="animate-spin" style={{ fontSize: 16 }} /> : 'Post'}
               </button>
             )
           ) : (
-            <button className="icon-btn-ghost" onClick={handleClose}>
+            <button className="icon-btn-ghost" onClick={handleClose} aria-label="Close">
               <FontAwesomeIcon icon={faXmark} style={{ fontSize: 20 }} />
             </button>
           )}
@@ -280,8 +306,128 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
           </div>
         )}
 
+        {/* Mobile Composer Body (max-width 640px) */}
+        <div className="create-modal-body mobile-body-only">
+          <div className="creator-user-row">
+            <img src={user?.avatar} alt={user?.fullName || 'User avatar'} className="creator-avatar" />
+            <div className="creator-meta">
+              <span className="creator-username">{user?.username}</span>
+              <div className="creator-privacy-badge">
+                <FontAwesomeIcon icon={faGlobe} style={{ fontSize: 12 }} />
+                <span>Public</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mobile-caption-group">
+            <textarea
+              ref={mobileTextareaRef}
+              placeholder="What's on your mind?"
+              value={caption}
+              onChange={(e) => handleCaptionInput(e, mobileTextareaRef)}
+              maxLength={2200}
+              className="mobile-caption-textarea"
+            />
+            {caption.length > 1800 && (
+              <div className="caption-footer-meta">
+                <span className="char-count">{caption.length}/2,200</span>
+              </div>
+            )}
+          </div>
+
+          <div className="mobile-photos-section">
+            {previewUrls.length === 0 ? (
+              <div
+                className="mobile-empty-photos"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <div className="mobile-empty-icon-ring">
+                  <FontAwesomeIcon icon={faImage} style={{ fontSize: 28, color: 'var(--accent-primary)' }} />
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-primary mobile-add-photos-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    fileInputRef.current?.click();
+                  }}
+                >
+                  Add photos
+                </button>
+                <span className="mobile-empty-hint">JPG, PNG or WEBP, up to 10MB each</span>
+              </div>
+            ) : previewUrls.length === 1 ? (
+              <div className="mobile-single-photo-wrapper">
+                <img
+                  src={previewUrls[0]}
+                  alt="Post preview"
+                  className="mobile-single-photo-img"
+                />
+                <button
+                  type="button"
+                  className="mobile-photo-remove-btn"
+                  onClick={() => handleRemoveImage(0)}
+                  aria-label="Remove image"
+                >
+                  <FontAwesomeIcon icon={faXmark} style={{ fontSize: 14 }} />
+                </button>
+              </div>
+            ) : (
+              <div className="mobile-multi-photos-strip">
+                {previewUrls.map((url, idx) => (
+                  <div key={idx} className="mobile-strip-thumb">
+                    <img src={url} alt={`Thumb ${idx + 1}`} />
+                    <button
+                      type="button"
+                      className="mobile-photo-remove-btn"
+                      onClick={() => handleRemoveImage(idx)}
+                      aria-label="Remove image"
+                    >
+                      <FontAwesomeIcon icon={faXmark} style={{ fontSize: 12 }} />
+                    </button>
+                  </div>
+                ))}
+                {previewUrls.length < 10 && (
+                  <button
+                    type="button"
+                    className="mobile-strip-add-tile"
+                    onClick={() => fileInputRef.current?.click()}
+                    aria-label="Add more photos"
+                  >
+                    +
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="mobile-details-compact">
+            <div className="details-field-row">
+              <FontAwesomeIcon icon={faLocationDot} style={{ fontSize: 16 }} className="field-icon" />
+              <input
+                type="text"
+                placeholder="Add location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="details-field-input"
+              />
+            </div>
+            <div className="details-field-row">
+              <FontAwesomeIcon icon={faHashtag} style={{ fontSize: 16 }} className="field-icon" />
+              <input
+                type="text"
+                placeholder="Tags (comma separated)"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                className="details-field-input"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Body (> 640px) */}
         <div
-          className={`create-modal-body ${dragActive ? 'drag-active' : ''}`}
+          className={`create-modal-body desktop-body-only ${dragActive ? 'drag-active' : ''}`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
@@ -311,10 +457,7 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
               </div>
             ) : (
               <div className="create-preview-stage">
-                <div
-                  className="stage-image-wrapper"
-                  style={{ aspectRatio: aspectRatio }}
-                >
+                <div className="stage-image-wrapper">
                   <img
                     src={previewUrls[currentPreviewIdx]}
                     alt="Current preview"
@@ -345,25 +488,6 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
                       </button>
                     </>
                   )}
-
-                  <div className="aspect-ratio-controls">
-                    <button
-                      type="button"
-                      className={`ratio-btn ${aspectRatio === '4/5' ? 'active' : ''}`}
-                      onClick={() => setAspectRatio('4/5')}
-                      title="Preview at 4:5"
-                    >
-                      4:5
-                    </button>
-                    <button
-                      type="button"
-                      className={`ratio-btn ${aspectRatio === '1/1' ? 'active' : ''}`}
-                      onClick={() => setAspectRatio('1/1')}
-                      title="Preview at 1:1"
-                    >
-                      1:1
-                    </button>
-                  </div>
                 </div>
 
                 <div className="thumbnails-strip">
@@ -401,10 +525,7 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
           ) : (
             <div className="create-split-view">
               <div className="split-preview-pane">
-                <div
-                  className="stage-image-wrapper"
-                  style={{ aspectRatio: aspectRatio }}
-                >
+                <div className="stage-image-wrapper">
                   <img
                     src={previewUrls[currentPreviewIdx]}
                     alt="Final preview"
@@ -437,9 +558,10 @@ const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
 
                 <div className="caption-input-group">
                   <textarea
+                    ref={textareaRef}
                     placeholder="Write a caption..."
                     value={caption}
-                    onChange={(e) => setCaption(e.target.value)}
+                    onChange={(e) => handleCaptionInput(e, textareaRef)}
                     rows={6}
                     maxLength={2200}
                     className="create-caption-textarea"
