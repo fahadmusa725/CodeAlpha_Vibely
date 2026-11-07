@@ -34,6 +34,53 @@ Vibely provides a complete media sharing and creator interaction workflow. Users
 - Admin Dashboard: Platform overview showing total users, posts, stories, user growth charts, account type breakdown, recent posts, recent signups, trending tags, user management table with search and filters, verified badge toggling, and user deletion
 - Theme: Dark and light theme switcher with preference stored in local storage
 
+## Screenshots
+
+The screenshots show the seeded demo data populated by the seed script (`cd server && npm run seed`).
+
+<table>
+  <tr>
+    <th>Login</th>
+    <th>Feed</th>
+    <th>Post detail</th>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/login.webp" alt="Login" width="100%"></td>
+    <td><img src="docs/screenshots/feed.webp" alt="Feed" width="100%"></td>
+    <td><img src="docs/screenshots/post-detail.webp" alt="Post detail" width="100%"></td>
+  </tr>
+  <tr>
+    <th>Profile</th>
+    <th>Discover</th>
+    <th>Search</th>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/profile.webp" alt="Profile" width="100%"></td>
+    <td><img src="docs/screenshots/discover.webp" alt="Discover" width="100%"></td>
+    <td><img src="docs/screenshots/search.webp" alt="Search" width="100%"></td>
+  </tr>
+  <tr>
+    <th>Stories</th>
+    <th>Notifications</th>
+    <th>Admin overview</th>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/stories.webp" alt="Stories" width="100%"></td>
+    <td><img src="docs/screenshots/notifications.webp" alt="Notifications" width="100%"></td>
+    <td><img src="docs/screenshots/admin-overview.webp" alt="Admin overview" width="100%"></td>
+  </tr>
+  <tr>
+    <th>Dark feed</th>
+    <th>Dark profile</th>
+    <th>Phone</th>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/dark-feed.webp" alt="Dark feed" width="100%"></td>
+    <td><img src="docs/screenshots/dark-profile.webp" alt="Dark profile" width="100%"></td>
+    <td><img src="docs/screenshots/phone-feed.webp" alt="Phone" width="100%"></td>
+  </tr>
+</table>
+
 ## Local Setup
 
 ### 1. Backend
