@@ -11,6 +11,7 @@ const Comment = require('../models/Comment');
 const Story = require('../models/Story');
 const Notification = require('../models/Notification');
 const { notify } = require('../utils/notify');
+const { extractHashtags } = require('../utils/extractHashtags');
 
 const seedRichData = async () => {
   try {
@@ -456,13 +457,6 @@ const seedRichData = async () => {
         tags: ['architecture', 'photography', 'brutalism'],
       }
     ];
-
-    const extractHashtags = (caption) => {
-      if (!caption) return [];
-      const matches = caption.match(/#(\w+)/g);
-      if (!matches) return [];
-      return [...new Set(matches.map((m) => m.slice(1).toLowerCase()))];
-    };
 
     const createdPosts = [];
     for (const postItem of postsData) {

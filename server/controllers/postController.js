@@ -4,13 +4,7 @@ const User = require('../models/User');
 const { uploadStream } = require('../config/cloudinary');
 const { notify, unnotify } = require('../utils/notify');
 const { getTrendingTagList } = require('../utils/trending');
-
-const extractHashtags = (caption) => {
-  if (!caption) return [];
-  const matches = caption.match(/#(\w+)/g);
-  if (!matches) return [];
-  return [...new Set(matches.map((m) => m.slice(1).toLowerCase()))];
-};
+const { extractHashtags } = require('../utils/extractHashtags');
 
 exports.createPost = async (req, res) => {
   try {
