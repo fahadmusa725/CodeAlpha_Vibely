@@ -11,6 +11,7 @@ const {
   getSuggestedUsers,
   getSavedPosts,
   getContacts,
+  updateCoverPosition,
 } = require('../controllers/userController');
 const { protect } = require('../middleware/auth');
 const optionalAuth = require('../middleware/optionalAuth');
@@ -21,6 +22,7 @@ router.get('/me/contacts', protect, getContacts);
 router.get('/search', optionalAuth, searchUsers);
 router.get('/suggested', optionalAuth, getSuggestedUsers);
 router.put('/profile', protect, updateProfile);
+router.put('/cover-position', protect, updateCoverPosition);
 router.put('/media', protect, upload.single('image'), updateUserMedia);
 router.post('/:id/follow', protect, toggleFollow);
 router.get('/:id/followers', optionalAuth, getFollowers);

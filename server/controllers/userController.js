@@ -49,6 +49,7 @@ exports.getUserProfile = async (req, res) => {
           email: req.user && req.user._id.toString() === user._id.toString() ? user.email : undefined,
           avatar: user.avatar,
           coverPhoto: user.coverPhoto,
+          coverPositionY: user.coverPositionY ?? 50,
           bio: user.bio,
           website: user.website,
           location: user.location,
@@ -201,6 +202,7 @@ exports.updateUserMedia = async (req, res) => {
 
     if (type === 'coverPhoto') {
       user.coverPhoto = mediaUrl;
+      user.coverPositionY = 50;
     } else {
       user.avatar = mediaUrl;
     }
@@ -213,6 +215,7 @@ exports.updateUserMedia = async (req, res) => {
       data: {
         avatar: user.avatar,
         coverPhoto: user.coverPhoto,
+        coverPositionY: user.coverPositionY,
       },
     });
   } catch (error) {
@@ -511,6 +514,53 @@ exports.getSavedPosts = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Server error fetching saved posts',
+    });
+  }
+};
+
+exports.updateCoverPosition = async (req, res) => {
+  try {
+    const { coverPositionY } = req.body;
+
+    if (
+      typeof coverPositionY !== 'number' ||
+      !Number.isFinite(coverPositionY) ||
+      coverPositionY < 0 ||
+      coverPositionY > 100
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid coverPositionY. Must be a finite number between 0 and 100.',
+      });
+    }
+
+    const rounded = Math.round(coverPositionY);
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { coverPositionY: rounded },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Cover position updated successfully',
+      data: {
+        coverPositionY: rounded,
+      },
+    });
+  } catch (error) {
+    console.error('updateCoverPosition error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error updating cover position',
     });
   }
 };

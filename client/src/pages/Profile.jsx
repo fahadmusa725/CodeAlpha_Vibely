@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCamera, faComment, faHeart, faLayerGroup, faLink, faLocationDot, faPen, faTableCellsLarge } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsUpDown, faCamera, faCheck, faComment, faHeart, faLayerGroup, faLink, faLocationDot, faPen, faTableCellsLarge, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../context/AuthContext';
 import PostDetailModal from '../components/PostDetailModal';
 import VerifiedBadge from '../components/VerifiedBadge';
@@ -37,8 +37,17 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
   const [profileError, setProfileError] = useState('');
   const [editProfileError, setEditProfileError] = useState('');
 
+  // Cover repositioning state
+  const [isRepositioning, setIsRepositioning] = useState(false);
+  const [tempCoverPositionY, setTempCoverPositionY] = useState(50);
+  const [savingCoverPosition, setSavingCoverPosition] = useState(false);
+  const [canReposition, setCanReposition] = useState(false);
+
   const avatarInputRef = useRef(null);
   const coverInputRef = useRef(null);
+  const coverWrapperRef = useRef(null);
+  const coverImgRef = useRef(null);
+  const dragStartRef = useRef(null);
 
   const isOwnProfile =
     currentUser &&
@@ -48,6 +57,109 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
   useEffect(() => {
     fetchProfile();
   }, [username, refreshKey]);
+
+  useEffect(() => {
+    if (profileUser) {
+      setTempCoverPositionY(profileUser.coverPositionY ?? 50);
+    }
+  }, [profileUser]);
+
+  const handleCoverImgLoad = () => {
+    const img = coverImgRef.current;
+    const wrapper = coverWrapperRef.current;
+    if (!img || !wrapper) {
+      setCanReposition(false);
+      return;
+    }
+    const naturalRatio = img.naturalWidth / img.naturalHeight;
+    const containerRatio = wrapper.clientWidth / wrapper.clientHeight;
+    // With object-fit: cover, vertical overflow exists if naturalRatio < containerRatio
+    // If naturalRatio >= containerRatio (wider than or equal to container ratio), the image spans full height and overflowing horizontally (no vertical overflow range)
+    const hasVerticalOverflow = naturalRatio < containerRatio - 0.005;
+    setCanReposition(hasVerticalOverflow);
+  };
+
+  const handlePointerDownCover = (e) => {
+    if (!isRepositioning) return;
+    e.preventDefault();
+    const wrapper = coverWrapperRef.current;
+    const img = coverImgRef.current;
+    if (!wrapper || !img) return;
+
+    // Rendered image height under object-fit: cover
+    const renderedHeight = (img.naturalHeight / img.naturalWidth) * wrapper.clientWidth;
+    const maxDragDistance = renderedHeight - wrapper.clientHeight;
+    if (maxDragDistance <= 0) return;
+
+    wrapper.setPointerCapture(e.pointerId);
+    dragStartRef.current = {
+      pointerId: e.pointerId,
+      startY: e.clientY,
+      startPosY: tempCoverPositionY,
+      maxDragDistance,
+    };
+  };
+
+  const handlePointerMoveCover = (e) => {
+    if (!isRepositioning || !dragStartRef.current) return;
+    if (dragStartRef.current.pointerId !== e.pointerId) return;
+
+    const { startY, startPosY, maxDragDistance } = dragStartRef.current;
+    const deltaY = e.clientY - startY;
+    // Dragging down (deltaY > 0) pulls the image down, so the top is revealed (lower object-position Y percentage)
+    // Dragging up (deltaY < 0) pulls the image up, revealing bottom (higher object-position Y percentage)
+    const deltaPercent = (deltaY / maxDragDistance) * 100;
+    const newPos = Math.min(100, Math.max(0, startPosY - deltaPercent));
+    setTempCoverPositionY(newPos);
+  };
+
+  const handlePointerUpCover = (e) => {
+    if (!isRepositioning || !dragStartRef.current) return;
+    if (dragStartRef.current.pointerId === e.pointerId) {
+      if (coverWrapperRef.current && coverWrapperRef.current.hasPointerCapture(e.pointerId)) {
+        coverWrapperRef.current.releasePointerCapture(e.pointerId);
+      }
+      dragStartRef.current = null;
+    }
+  };
+
+  const handleStartReposition = () => {
+    setProfileError('');
+    setTempCoverPositionY(profileUser.coverPositionY ?? 50);
+    setIsRepositioning(true);
+  };
+
+  const handleCancelReposition = () => {
+    setIsRepositioning(false);
+    setTempCoverPositionY(profileUser.coverPositionY ?? 50);
+  };
+
+  const handleSaveReposition = async () => {
+    setSavingCoverPosition(true);
+    setProfileError('');
+    const roundedPos = Math.round(tempCoverPositionY);
+
+    try {
+      const res = await api.put('/users/cover-position', {
+        coverPositionY: roundedPos,
+      });
+
+      if (res.data.success) {
+        setProfileUser((prev) => ({
+          ...prev,
+          coverPositionY: roundedPos,
+        }));
+        updateUser({
+          coverPositionY: roundedPos,
+        });
+        setIsRepositioning(false);
+      }
+    } catch (err) {
+      setProfileError(err.response?.data?.message || 'Failed to save cover position');
+    } finally {
+      setSavingCoverPosition(false);
+    }
+  };
 
   const fetchProfile = async () => {
     setLoading(true);
@@ -201,8 +313,15 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
 
         if (res.data.success) {
           if (type === 'coverPhoto') {
-            setProfileUser((prev) => ({ ...prev, coverPhoto: res.data.data.coverPhoto }));
-            updateUser({ coverPhoto: res.data.data.coverPhoto });
+            setProfileUser((prev) => ({
+              ...prev,
+              coverPhoto: res.data.data.coverPhoto,
+              coverPositionY: res.data.data.coverPositionY ?? 50,
+            }));
+            updateUser({
+              coverPhoto: res.data.data.coverPhoto,
+              coverPositionY: res.data.data.coverPositionY ?? 50,
+            });
           } else {
             setProfileUser((prev) => ({ ...prev, avatar: res.data.data.avatar }));
             updateUser({ avatar: res.data.data.avatar });
@@ -218,8 +337,15 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
         });
         if (res.data.success) {
           if (type === 'coverPhoto') {
-            setProfileUser((prev) => ({ ...prev, coverPhoto: res.data.data.coverPhoto }));
-            updateUser({ coverPhoto: res.data.data.coverPhoto });
+            setProfileUser((prev) => ({
+              ...prev,
+              coverPhoto: res.data.data.coverPhoto,
+              coverPositionY: res.data.data.coverPositionY ?? 50,
+            }));
+            updateUser({
+              coverPhoto: res.data.data.coverPhoto,
+              coverPositionY: res.data.data.coverPositionY ?? 50,
+            });
           } else {
             setProfileUser((prev) => ({ ...prev, avatar: res.data.data.avatar }));
             updateUser({ avatar: res.data.data.avatar });
@@ -295,25 +421,85 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
     );
   }
 
+  const activeCoverPositionY = isRepositioning
+    ? tempCoverPositionY
+    : (profileUser.coverPositionY ?? 50);
+
   return (
     <div className="profile-container">
       {profileError && <div className="profile-action-error">{profileError}</div>}
-      <div className="profile-cover-wrapper">
+      <div
+        className={`profile-cover-wrapper ${isRepositioning ? 'repositioning' : ''}`}
+        ref={coverWrapperRef}
+        onPointerDown={handlePointerDownCover}
+        onPointerMove={handlePointerMoveCover}
+        onPointerUp={handlePointerUpCover}
+        onPointerCancel={handlePointerUpCover}
+      >
         {profileUser.coverPhoto ? (
           <img
+            ref={coverImgRef}
             src={profileUser.coverPhoto}
             alt="Cover"
             className="profile-cover-img"
+            onLoad={handleCoverImgLoad}
+            style={{ objectPosition: `50% ${activeCoverPositionY}%` }}
+            draggable={false}
           />
         ) : null}
+
+        {isRepositioning && (
+          <div className="cover-reposition-overlay">
+            <span className="cover-reposition-hint">Drag to reposition</span>
+          </div>
+        )}
+
         {isOwnProfile && (
-          <button
-            className="change-cover-btn"
-            onClick={() => coverInputRef.current?.click()}
-          >
-            <FontAwesomeIcon icon={faCamera} style={{ fontSize: 14 }} />
-            <span>Edit Cover</span>
-          </button>
+          <div className="cover-actions-group">
+            {isRepositioning ? (
+              <div className="reposition-controls">
+                <button
+                  type="button"
+                  className="cover-control-btn cancel-btn"
+                  onClick={handleCancelReposition}
+                  disabled={savingCoverPosition}
+                >
+                  <FontAwesomeIcon icon={faXmark} style={{ fontSize: 13 }} />
+                  <span>Cancel</span>
+                </button>
+                <button
+                  type="button"
+                  className="cover-control-btn save-btn"
+                  onClick={handleSaveReposition}
+                  disabled={savingCoverPosition}
+                >
+                  <FontAwesomeIcon icon={faCheck} style={{ fontSize: 13 }} />
+                  <span>{savingCoverPosition ? 'Saving...' : 'Save'}</span>
+                </button>
+              </div>
+            ) : (
+              <div className="default-cover-controls">
+                {profileUser.coverPhoto && canReposition && (
+                  <button
+                    type="button"
+                    className="change-cover-btn reposition-trigger-btn"
+                    onClick={handleStartReposition}
+                  >
+                    <FontAwesomeIcon icon={faArrowsUpDown} style={{ fontSize: 13 }} />
+                    <span>Reposition</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="change-cover-btn"
+                  onClick={() => coverInputRef.current?.click()}
+                >
+                  <FontAwesomeIcon icon={faCamera} style={{ fontSize: 13 }} />
+                  <span>Edit Cover</span>
+                </button>
+              </div>
+            )}
+          </div>
         )}
         <input
           type="file"
