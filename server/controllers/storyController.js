@@ -59,7 +59,7 @@ exports.createStory = async (req, res) => {
         });
       }
 
-      const allowedTypes = ['image'];
+      const allowedTypes = ['image', 'video'];
       if (!allowedTypes.includes(mediaType)) {
         return res.status(400).json({
           success: false,
@@ -69,10 +69,13 @@ exports.createStory = async (req, res) => {
 
       const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
       const expectedPrefix = `https://res.cloudinary.com/${cloudName}/`;
+      const expectedResourcePath = mediaType === 'video' ? '/video/upload/' : '/image/upload/';
+
       if (
         !cloudName ||
         !mediaUrl.startsWith(expectedPrefix) ||
-        !mediaUrl.includes('/vibely/stories/')
+        !mediaUrl.includes('/vibely/stories/') ||
+        !mediaUrl.includes(expectedResourcePath)
       ) {
         return res.status(400).json({
           success: false,

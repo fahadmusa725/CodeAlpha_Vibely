@@ -7,7 +7,12 @@ const PURPOSE_FOLDERS = {
   cover: 'vibely_profiles',
 };
 
-const ALLOWED_FORMATS_STR = 'jpg,png,webp,gif';
+const PURPOSE_ALLOWED_FORMATS = {
+  story: 'jpg,png,webp,gif,mp4,mov,webm',
+  post: 'jpg,png,webp,gif',
+  avatar: 'jpg,png,webp,gif',
+  cover: 'jpg,png,webp,gif',
+};
 
 exports.getUploadSignature = async (req, res) => {
   try {
@@ -40,7 +45,7 @@ exports.getUploadSignature = async (req, res) => {
 
     const timestamp = Math.round(Date.now() / 1000);
     const folder = PURPOSE_FOLDERS[purpose];
-    const allowedFormats = ALLOWED_FORMATS_STR;
+    const allowedFormats = PURPOSE_ALLOWED_FORMATS[purpose];
 
     const signature = cloudinary.utils.api_sign_request(
       {

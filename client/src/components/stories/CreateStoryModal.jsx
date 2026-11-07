@@ -1,57 +1,128 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera, faXmark } from '@fortawesome/free-solid-svg-icons';
 import api from '../../services/api';
 import './CreateStoryModal.css';
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/webm'];
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
+const MAX_VIDEO_DURATION = 30; // 30 seconds
 
 const CreateStoryModal = ({ onClose, onStoryCreated }) => {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState('');
+  const [mediaType, setMediaType] = useState('image');
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState('');
 
-  const handleFileChange = (e) => {
+  useEffect(() => {
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
+
+  const checkVideoDuration = (videoUrl) => {
+    return new Promise((resolve, reject) => {
+      const tempVideo = document.createElement('video');
+      tempVideo.preload = 'metadata';
+      tempVideo.onloadedmetadata = () => {
+        resolve(tempVideo.duration);
+      };
+      tempVideo.onerror = () => {
+        reject(new Error('Failed to load video metadata.'));
+      };
+      tempVideo.src = videoUrl;
+    });
+  };
+
+  const handleFileChange = async (e) => {
     const selected = e.target.files[0];
     if (!selected) return;
 
-    if (!ALLOWED_TYPES.includes(selected.type)) {
-      setError('Only JPEG, PNG, WEBP, and GIF images are allowed.');
-      setFile(null);
+    if (preview) {
+      URL.revokeObjectURL(preview);
       setPreview('');
+    }
+
+    const isImage = ALLOWED_IMAGE_TYPES.includes(selected.type);
+    const isVideo = ALLOWED_VIDEO_TYPES.includes(selected.type);
+
+    if (!isImage && !isVideo) {
+      setError('Only JPG, PNG, WEBP, GIF images and MP4, MOV, WEBM videos are allowed.');
+      setFile(null);
+      setMediaType('image');
       return;
     }
 
-    if (selected.size > MAX_FILE_SIZE) {
-      setError('Image must be less than 10MB.');
+    if (isImage && selected.size > MAX_IMAGE_SIZE) {
+      setError('Images must be less than 10MB.');
       setFile(null);
-      setPreview('');
+      setMediaType('image');
       return;
+    }
+
+    if (isVideo && selected.size > MAX_VIDEO_SIZE) {
+      setError('Videos must be less than 50MB.');
+      setFile(null);
+      setMediaType('image');
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(selected);
+
+    if (isVideo) {
+      try {
+        const duration = await checkVideoDuration(objectUrl);
+        if (duration > MAX_VIDEO_DURATION) {
+          URL.revokeObjectURL(objectUrl);
+          setError(`Video must be 30 seconds or less (${Math.round(duration)}s selected).`);
+          setFile(null);
+          setMediaType('image');
+          return;
+        }
+      } catch {
+        URL.revokeObjectURL(objectUrl);
+        setError('Failed to inspect video duration. Please try another video.');
+        setFile(null);
+        setMediaType('image');
+        return;
+      }
     }
 
     setError('');
     setFile(selected);
-    setPreview(URL.createObjectURL(selected));
+    setMediaType(isVideo ? 'video' : 'image');
+    setPreview(objectUrl);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) {
-      setError('Please select an image to share.');
+      setError('Please select an image, GIF, or video to share.');
       return;
     }
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      setError('Only JPEG, PNG, WEBP, and GIF images are allowed.');
+    const isImage = ALLOWED_IMAGE_TYPES.includes(file.type);
+    const isVideo = ALLOWED_VIDEO_TYPES.includes(file.type);
+
+    if (!isImage && !isVideo) {
+      setError('Only JPG, PNG, WEBP, GIF images and MP4, MOV, WEBM videos are allowed.');
       return;
     }
 
-    if (file.size > MAX_FILE_SIZE) {
-      setError('Image must be less than 10MB.');
+    if (isImage && file.size > MAX_IMAGE_SIZE) {
+      setError('Images must be less than 10MB.');
+      return;
+    }
+
+    if (isVideo && file.size > MAX_VIDEO_SIZE) {
+      setError('Videos must be less than 50MB.');
       return;
     }
 
@@ -98,7 +169,7 @@ const CreateStoryModal = ({ onClose, onStoryCreated }) => {
         const secureUrl = cldRes.data.secure_url;
         await api.post('/stories', {
           mediaUrl: secureUrl,
-          mediaType: 'image',
+          mediaType: isVideo ? 'video' : 'image',
         });
       } else {
         const formData = new FormData();
@@ -144,18 +215,29 @@ const CreateStoryModal = ({ onClose, onStoryCreated }) => {
         <form onSubmit={handleSubmit} className="create-story-form">
           <div className="preview-container">
             {preview ? (
-              <img src={preview} alt="Story Preview" className="story-preview-img" />
+              mediaType === 'video' ? (
+                <video
+                  src={preview}
+                  muted
+                  playsInline
+                  autoPlay
+                  loop
+                  className="story-preview-video"
+                />
+              ) : (
+                <img src={preview} alt="Story Preview" className="story-preview-img" />
+              )
             ) : (
               <div className="upload-placeholder">
                 <FontAwesomeIcon icon={faCamera} style={{ fontSize: 32 }} />
-                <span>Select an image or GIF for your 24h story</span>
+                <span>Select a photo, GIF, or video (up to 30s)</span>
               </div>
             )}
           </div>
 
           <input
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
+            accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,video/webm"
             id="story-file-input"
             onChange={handleFileChange}
             style={{ display: 'none' }}
@@ -175,7 +257,7 @@ const CreateStoryModal = ({ onClose, onStoryCreated }) => {
 
           <div className="create-story-actions">
             <label htmlFor="story-file-input" className="select-file-btn">
-              {file ? 'Change Photo' : 'Choose Photo'}
+              {file ? 'Change Media' : 'Choose Media'}
             </label>
             <button
               type="submit"

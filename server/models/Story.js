@@ -13,7 +13,7 @@ const storySchema = new mongoose.Schema(
     },
     mediaType: {
       type: String,
-      enum: ['image'],
+      enum: ['image', 'video'],
       default: 'image',
     },
     expiresAt: {

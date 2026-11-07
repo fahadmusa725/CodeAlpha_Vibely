@@ -6,6 +6,26 @@ import CreateStoryModal from './CreateStoryModal';
 import { getAvatarUrl } from '../../utils/avatar';
 import './StoriesTray.css';
 
+const getStoryThumbnailUrl = (story, userFallback) => {
+  if (!story) {
+    return userFallback;
+  }
+
+  if (story.mediaType === 'video' && story.mediaUrl) {
+    const videoUrl = story.mediaUrl;
+    const uploadIdx = videoUrl.indexOf('/upload/');
+    if (uploadIdx !== -1) {
+      const prefix = videoUrl.slice(0, uploadIdx + 8); // includes '/upload/'
+      const rest = videoUrl.slice(uploadIdx + 8);
+      const dotIdx = rest.lastIndexOf('.');
+      const pathWithoutExt = dotIdx !== -1 ? rest.slice(0, dotIdx) : rest;
+      return `${prefix}so_0/${pathWithoutExt}.jpg`;
+    }
+  }
+
+  return story.mediaUrl || userFallback;
+};
+
 const StoriesTray = () => {
   const { user, isAuthenticated } = useAuth();
   const [groups, setGroups] = useState([]);
@@ -59,7 +79,14 @@ const StoriesTray = () => {
             }}
           >
             <img
-              src={getAvatarUrl(user?.avatar, user?.fullName)}
+              src={
+                myGroup && myGroup.stories.length > 0
+                  ? getStoryThumbnailUrl(
+                      myGroup.stories[0],
+                      getAvatarUrl(user?.avatar, user?.fullName)
+                    )
+                  : getAvatarUrl(user?.avatar, user?.fullName)
+              }
               alt={user?.username || 'My Story'}
               className="story-avatar-img"
             />
@@ -81,6 +108,8 @@ const StoriesTray = () => {
           .filter((g) => g.user._id !== user?._id)
           .map((group) => {
             const globalIdx = groups.findIndex((g) => g.user._id === group.user._id);
+            const firstStory = group.stories && group.stories[0];
+            const fallbackAvatar = getAvatarUrl(group.user.avatar, group.user.fullName);
             return (
               <div
                 key={group.user._id}
@@ -93,7 +122,7 @@ const StoriesTray = () => {
                   }`}
                 >
                   <img
-                    src={getAvatarUrl(group.user.avatar, group.user.fullName)}
+                    src={getStoryThumbnailUrl(firstStory, fallbackAvatar)}
                     alt={group.user.username}
                     className="story-avatar-img"
                   />
