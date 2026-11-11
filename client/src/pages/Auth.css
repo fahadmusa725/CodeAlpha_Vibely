@@ -117,6 +117,17 @@
   outline: none;
 }
 
+.auth-input-wrapper input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.auth-field-error {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--danger);
+  margin-top: 2px;
+}
+
 .auth-submit-btn {
   width: 100%;
   padding: 14px;

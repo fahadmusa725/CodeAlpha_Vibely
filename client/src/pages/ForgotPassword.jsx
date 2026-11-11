@@ -3,34 +3,66 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faCircleCheck, faCircleExclamation, faEnvelope, faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons';
 import api from '../services/api';
+import { validateField } from '../utils/validators';
 import './Auth.css';
 import './ForgotPassword.css';
 
 const ForgotPassword = () => {
   const [email, setEmail]           = useState('');
+  const [emailError, setEmailError] = useState('');
   const [loading, setLoading]       = useState(false);
   const [error, setError]           = useState('');
   const [success, setSuccess]       = useState(false);
 
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+    if (error) setError('');
+    if (emailError) {
+      const err = validateField('email', value);
+      if (!err) setEmailError('');
+    }
+  };
+
+  const handleEmailBlur = (e) => {
+    const err = validateField('email', e.target.value);
+    setEmailError(err);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    setError('');
+
+    const err = validateField('email', email);
+    if (err) {
+      setEmailError(err);
+      return;
+    }
 
     setLoading(true);
-    setError('');
 
     try {
       const res = await api.post('/auth/forgot-password', { email: email.trim() });
 
       if (!res.data.success) {
-        setError(res.data.message || 'Something went wrong. Please try again.');
+        const msg = res.data.message || 'Something went wrong. Please try again.';
+        if (msg.toLowerCase().includes('email')) {
+          setEmailError(msg);
+        } else {
+          setError(msg);
+        }
         return;
       }
 
       setSuccess(true);
 
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred. Please try again.');
+      const msg = err.response?.data?.message || 'An error occurred. Please try again.';
+      if (msg.toLowerCase().includes('email')) {
+        setEmailError(msg);
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -60,23 +92,29 @@ const ForgotPassword = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="auth-form">
+            <form onSubmit={handleSubmit} className="auth-form" noValidate>
               <div className="auth-input-group">
-                <label>Email Address</label>
+                <label htmlFor="forgotPasswordEmail">Email Address</label>
                 <div className="auth-input-wrapper">
                   <FontAwesomeIcon icon={faEnvelope} style={{ fontSize: 18 }} className="auth-input-icon" />
                   <input
+                    id="forgotPasswordEmail"
                     type="email"
                     name="email"
                     placeholder="sophia@example.com"
                     value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      if (error) setError('');
-                    }}
+                    onChange={handleEmailChange}
+                    onBlur={handleEmailBlur}
+                    aria-invalid={Boolean(emailError)}
+                    aria-describedby={emailError ? 'forgotPasswordEmail-error' : undefined}
                     required
                   />
                 </div>
+                {emailError && (
+                  <span id="forgotPasswordEmail-error" className="auth-field-error" role="alert">
+                    {emailError}
+                  </span>
+                )}
               </div>
 
               <button

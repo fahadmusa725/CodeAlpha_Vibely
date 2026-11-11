@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const User = require('../models/User');
 const Post = require('../models/Post');
 const { sendResetEmail } = require('../utils/email');
+const { isValidEmail } = require('../utils/validators');
 
 const generateToken = (id) => {
   return jwt.sign(
@@ -62,10 +63,10 @@ exports.register = async (req, res) => {
       });
     }
 
-    if (!/\S+@\S+\.\S+/.test(trimmedEmail)) {
+    if (!isValidEmail(trimmedEmail)) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide a valid email address',
+        message: 'Enter a valid email address',
       });
     }
 
@@ -309,8 +310,8 @@ exports.forgotPassword = async (req, res) => {
     }
 
     const trimmedEmail = email.trim().toLowerCase();
-    if (!trimmedEmail || !/\S+@\S+\.\S+/.test(trimmedEmail)) {
-      return res.status(400).json({ success: false, message: 'Please provide a valid email address' });
+    if (!trimmedEmail || !isValidEmail(trimmedEmail)) {
+      return res.status(400).json({ success: false, message: 'Enter a valid email address' });
     }
 
     const user = await User.findOne({ email: trimmedEmail });
