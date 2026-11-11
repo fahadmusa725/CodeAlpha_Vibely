@@ -1,0 +1,58 @@
+.avatar-cropper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.avatar-cropper-circle {
+  width: 200px;
+  height: 200px;
+  border-radius: var(--radius-full);
+  border: 3px solid var(--accent-primary);
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-subtle);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.avatar-cropper-circle.is-dragging {
+  cursor: grabbing;
+  touch-action: none;
+}
+
+.avatar-cropper-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: none;
+  max-height: none;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.avatar-cropper-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 260px;
+}
+
+.avatar-cropper-zoom-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 40px;
+}
+
+.avatar-cropper-slider {
+  flex: 1;
+  cursor: pointer;
+  accent-color: var(--accent-primary);
+}
+

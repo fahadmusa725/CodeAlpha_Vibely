@@ -25,17 +25,6 @@
   border-bottom: none;
 }
 
-.profile-cover-wrapper.repositioning {
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.profile-cover-wrapper.repositioning:active {
-  cursor: grabbing;
-}
-
 .profile-cover-img {
   width: 100%;
   height: 100%;
@@ -43,96 +32,6 @@
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
-}
-
-.cover-reposition-overlay {
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.75);
-  color: #ffffff;
-  padding: 6px 14px;
-  border-radius: var(--radius-full);
-  font-size: 0.75rem;
-  font-weight: 500;
-  pointer-events: none;
-  z-index: 5;
-  box-shadow: var(--shadow-sm);
-  white-space: nowrap;
-}
-
-.cover-actions-group {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-}
-
-.default-cover-controls,
-.reposition-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.change-cover-btn,
-.cover-control-btn {
-  background: rgba(0, 0, 0, 0.75);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: opacity 0.15s ease, background-color 0.15s ease;
-  white-space: nowrap;
-}
-
-.change-cover-btn:hover,
-.cover-control-btn:hover:not(:disabled) {
-  background: rgba(0, 0, 0, 0.9);
-}
-
-.cover-control-btn.save-btn {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
-  color: var(--accent-fg);
-  font-weight: 600;
-}
-
-.cover-control-btn.save-btn:hover:not(:disabled) {
-  opacity: 0.9;
-}
-
-.cover-control-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-@media (max-width: 640px) {
-  .cover-actions-group {
-    bottom: 8px;
-    right: 8px;
-  }
-
-  .default-cover-controls,
-  .reposition-controls {
-    gap: 6px;
-  }
-
-  .change-cover-btn,
-  .cover-control-btn {
-    padding: 5px 9px;
-    font-size: 0.7rem;
-    gap: 4px;
-  }
 }
 
 .profile-header-card {

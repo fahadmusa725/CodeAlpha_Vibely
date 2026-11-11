@@ -1,17 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowsUpDown, faCamera, faCheck, faComment, faHeart, faLayerGroup, faLink, faLocationDot, faPen, faTableCellsLarge, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faComment, faHeart, faLayerGroup, faLink, faLocationDot, faPen, faTableCellsLarge } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../context/AuthContext';
 import PostDetailModal from '../components/PostDetailModal';
 import VerifiedBadge from '../components/VerifiedBadge';
+import EditProfileModal from '../components/profile/EditProfileModal';
 import api from '../services/api';
 import { getAvatarUrl } from '../utils/avatar';
 import './Profile.css';
-
-const ALLOWED_MEDIA_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_MEDIA_SIZE = 10 * 1024 * 1024;
 
 const Profile = ({ onOpenCreateModal, refreshKey }) => {
   const { username } = useParams();
@@ -29,25 +26,6 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
   const [loadingFollowList, setLoadingFollowList] = useState(false);
 
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editFullName, setEditFullName] = useState('');
-  const [editBio, setEditBio] = useState('');
-  const [editWebsite, setEditWebsite] = useState('');
-  const [editLocation, setEditLocation] = useState('');
-  const [savingProfile, setSavingProfile] = useState(false);
-  const [profileError, setProfileError] = useState('');
-  const [editProfileError, setEditProfileError] = useState('');
-
-  // Cover repositioning state
-  const [isRepositioning, setIsRepositioning] = useState(false);
-  const [tempCoverPositionY, setTempCoverPositionY] = useState(50);
-  const [savingCoverPosition, setSavingCoverPosition] = useState(false);
-  const [canReposition, setCanReposition] = useState(false);
-
-  const avatarInputRef = useRef(null);
-  const coverInputRef = useRef(null);
-  const coverWrapperRef = useRef(null);
-  const coverImgRef = useRef(null);
-  const dragStartRef = useRef(null);
 
   const isOwnProfile =
     currentUser &&
@@ -58,109 +36,6 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
     fetchProfile();
   }, [username, refreshKey]);
 
-  useEffect(() => {
-    if (profileUser) {
-      setTempCoverPositionY(profileUser.coverPositionY ?? 50);
-    }
-  }, [profileUser]);
-
-  const handleCoverImgLoad = () => {
-    const img = coverImgRef.current;
-    const wrapper = coverWrapperRef.current;
-    if (!img || !wrapper) {
-      setCanReposition(false);
-      return;
-    }
-    const naturalRatio = img.naturalWidth / img.naturalHeight;
-    const containerRatio = wrapper.clientWidth / wrapper.clientHeight;
-    // With object-fit: cover, vertical overflow exists if naturalRatio < containerRatio
-    // If naturalRatio >= containerRatio (wider than or equal to container ratio), the image spans full height and overflowing horizontally (no vertical overflow range)
-    const hasVerticalOverflow = naturalRatio < containerRatio - 0.005;
-    setCanReposition(hasVerticalOverflow);
-  };
-
-  const handlePointerDownCover = (e) => {
-    if (!isRepositioning) return;
-    e.preventDefault();
-    const wrapper = coverWrapperRef.current;
-    const img = coverImgRef.current;
-    if (!wrapper || !img) return;
-
-    // Rendered image height under object-fit: cover
-    const renderedHeight = (img.naturalHeight / img.naturalWidth) * wrapper.clientWidth;
-    const maxDragDistance = renderedHeight - wrapper.clientHeight;
-    if (maxDragDistance <= 0) return;
-
-    wrapper.setPointerCapture(e.pointerId);
-    dragStartRef.current = {
-      pointerId: e.pointerId,
-      startY: e.clientY,
-      startPosY: tempCoverPositionY,
-      maxDragDistance,
-    };
-  };
-
-  const handlePointerMoveCover = (e) => {
-    if (!isRepositioning || !dragStartRef.current) return;
-    if (dragStartRef.current.pointerId !== e.pointerId) return;
-
-    const { startY, startPosY, maxDragDistance } = dragStartRef.current;
-    const deltaY = e.clientY - startY;
-    // Dragging down (deltaY > 0) pulls the image down, so the top is revealed (lower object-position Y percentage)
-    // Dragging up (deltaY < 0) pulls the image up, revealing bottom (higher object-position Y percentage)
-    const deltaPercent = (deltaY / maxDragDistance) * 100;
-    const newPos = Math.min(100, Math.max(0, startPosY - deltaPercent));
-    setTempCoverPositionY(newPos);
-  };
-
-  const handlePointerUpCover = (e) => {
-    if (!isRepositioning || !dragStartRef.current) return;
-    if (dragStartRef.current.pointerId === e.pointerId) {
-      if (coverWrapperRef.current && coverWrapperRef.current.hasPointerCapture(e.pointerId)) {
-        coverWrapperRef.current.releasePointerCapture(e.pointerId);
-      }
-      dragStartRef.current = null;
-    }
-  };
-
-  const handleStartReposition = () => {
-    setProfileError('');
-    setTempCoverPositionY(profileUser.coverPositionY ?? 50);
-    setIsRepositioning(true);
-  };
-
-  const handleCancelReposition = () => {
-    setIsRepositioning(false);
-    setTempCoverPositionY(profileUser.coverPositionY ?? 50);
-  };
-
-  const handleSaveReposition = async () => {
-    setSavingCoverPosition(true);
-    setProfileError('');
-    const roundedPos = Math.round(tempCoverPositionY);
-
-    try {
-      const res = await api.put('/users/cover-position', {
-        coverPositionY: roundedPos,
-      });
-
-      if (res.data.success) {
-        setProfileUser((prev) => ({
-          ...prev,
-          coverPositionY: roundedPos,
-        }));
-        updateUser({
-          coverPositionY: roundedPos,
-        });
-        setIsRepositioning(false);
-      }
-    } catch (err) {
-      setProfileError(err.response?.data?.message || 'Failed to save cover position');
-    } finally {
-      setSavingCoverPosition(false);
-    }
-  };
-
   const fetchProfile = async () => {
     setLoading(true);
     try {
@@ -169,11 +44,6 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
         setProfileUser(res.data.data.user);
         setPosts(res.data.data.posts);
         setIsFollowing(res.data.data.user.isFollowing);
-
-        setEditFullName(res.data.data.user.fullName || '');
-        setEditBio(res.data.data.user.bio || '');
-        setEditWebsite(res.data.data.user.website || '');
-        setEditLocation(res.data.data.user.location || '');
       }
     } catch {
       // Profile fetch failure handled
@@ -256,147 +126,6 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
     }
   };
 
-  const handleMediaUpload = async (e, type) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (!ALLOWED_MEDIA_TYPES.includes(file.type)) {
-      setProfileError('Only JPG, PNG, and WEBP images are allowed.');
-      e.target.value = '';
-      return;
-    }
-
-    if (file.size > MAX_MEDIA_SIZE) {
-      setProfileError('Image must be less than 10MB.');
-      e.target.value = '';
-      return;
-    }
-
-    setProfileError('');
-
-    try {
-      const purpose = type === 'coverPhoto' ? 'cover' : 'avatar';
-      const sigRes = await api.get(`/uploads/signature?purpose=${purpose}`);
-      const sigData = sigRes.data;
-
-      if (sigData.success && sigData.directUpload) {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('api_key', sigData.apiKey);
-        formData.append('timestamp', sigData.timestamp);
-        formData.append('folder', sigData.folder);
-        if (sigData.allowedFormats) {
-          formData.append('allowed_formats', sigData.allowedFormats);
-        }
-        formData.append('signature', sigData.signature);
-
-        const uploadUrl = `https://api.cloudinary.com/v1_1/${sigData.cloudName}/auto/upload`;
-
-        let cldRes;
-        try {
-          cldRes = await axios.post(uploadUrl, formData);
-        } catch (cldErr) {
-          if (!cldErr.response) {
-            setProfileError('Network error uploading to Cloudinary. Please check your connection.');
-          } else {
-            setProfileError(cldErr.response.data?.error?.message || 'Failed to upload media to Cloudinary.');
-          }
-          e.target.value = '';
-          return;
-        }
-
-        const res = await api.put('/users/media', {
-          type,
-          url: cldRes.data.secure_url,
-          public_id: cldRes.data.public_id,
-        });
-
-        if (res.data.success) {
-          if (type === 'coverPhoto') {
-            setProfileUser((prev) => ({
-              ...prev,
-              coverPhoto: res.data.data.coverPhoto,
-              coverPositionY: res.data.data.coverPositionY ?? 50,
-            }));
-            updateUser({
-              coverPhoto: res.data.data.coverPhoto,
-              coverPositionY: res.data.data.coverPositionY ?? 50,
-            });
-          } else {
-            setProfileUser((prev) => ({ ...prev, avatar: res.data.data.avatar }));
-            updateUser({ avatar: res.data.data.avatar });
-          }
-        }
-      } else {
-        const formData = new FormData();
-        formData.append('image', file);
-        formData.append('type', type);
-
-        const res = await api.put('/users/media', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-        if (res.data.success) {
-          if (type === 'coverPhoto') {
-            setProfileUser((prev) => ({
-              ...prev,
-              coverPhoto: res.data.data.coverPhoto,
-              coverPositionY: res.data.data.coverPositionY ?? 50,
-            }));
-            updateUser({
-              coverPhoto: res.data.data.coverPhoto,
-              coverPositionY: res.data.data.coverPositionY ?? 50,
-            });
-          } else {
-            setProfileUser((prev) => ({ ...prev, avatar: res.data.data.avatar }));
-            updateUser({ avatar: res.data.data.avatar });
-          }
-        }
-      }
-    } catch (err) {
-      if (!err.response) {
-        setProfileError('Network failure. Please check your connection.');
-      } else {
-        setProfileError(err.response?.data?.message || 'Media upload failed');
-      }
-    } finally {
-      e.target.value = '';
-    }
-  };
-
-  const handleSaveProfile = async (e) => {
-    e.preventDefault();
-    setSavingProfile(true);
-    setEditProfileError('');
-    try {
-      const res = await api.put('/users/profile', {
-        fullName: editFullName,
-        bio: editBio,
-        website: editWebsite,
-        location: editLocation,
-      });
-      if (res.data.success) {
-        setProfileUser((prev) => ({
-          ...prev,
-          fullName: editFullName,
-          bio: editBio,
-          website: editWebsite,
-          location: editLocation,
-        }));
-        updateUser({
-          fullName: editFullName,
-          bio: editBio,
-          website: editWebsite,
-          location: editLocation,
-        });
-        setShowEditModal(false);
-      }
-    } catch (err) {
-      setEditProfileError(err.response?.data?.message || 'Update failed');
-    } finally {
-      setSavingProfile(false);
-    }
-  };
-
   if (loading) {
     return (
       <div className="profile-container skeleton-profile-view">
@@ -421,93 +150,18 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
     );
   }
 
-  const activeCoverPositionY = isRepositioning
-    ? tempCoverPositionY
-    : (profileUser.coverPositionY ?? 50);
-
   return (
     <div className="profile-container">
-      {profileError && <div className="profile-action-error">{profileError}</div>}
-      <div
-        className={`profile-cover-wrapper ${isRepositioning ? 'repositioning' : ''}`}
-        ref={coverWrapperRef}
-        onPointerDown={handlePointerDownCover}
-        onPointerMove={handlePointerMoveCover}
-        onPointerUp={handlePointerUpCover}
-        onPointerCancel={handlePointerUpCover}
-      >
+      <div className="profile-cover-wrapper">
         {profileUser.coverPhoto ? (
           <img
-            ref={coverImgRef}
             src={profileUser.coverPhoto}
             alt="Cover"
             className="profile-cover-img"
-            onLoad={handleCoverImgLoad}
-            style={{ objectPosition: `50% ${activeCoverPositionY}%` }}
+            style={{ objectPosition: `50% ${profileUser.coverPositionY ?? 50}%` }}
             draggable={false}
           />
         ) : null}
-
-        {isRepositioning && (
-          <div className="cover-reposition-overlay">
-            <span className="cover-reposition-hint">Drag to reposition</span>
-          </div>
-        )}
-
-        {isOwnProfile && (
-          <div className="cover-actions-group">
-            {isRepositioning ? (
-              <div className="reposition-controls">
-                <button
-                  type="button"
-                  className="cover-control-btn cancel-btn"
-                  onClick={handleCancelReposition}
-                  disabled={savingCoverPosition}
-                >
-                  <FontAwesomeIcon icon={faXmark} style={{ fontSize: 13 }} />
-                  <span>Cancel</span>
-                </button>
-                <button
-                  type="button"
-                  className="cover-control-btn save-btn"
-                  onClick={handleSaveReposition}
-                  disabled={savingCoverPosition}
-                >
-                  <FontAwesomeIcon icon={faCheck} style={{ fontSize: 13 }} />
-                  <span>{savingCoverPosition ? 'Saving...' : 'Save'}</span>
-                </button>
-              </div>
-            ) : (
-              <div className="default-cover-controls">
-                {profileUser.coverPhoto && canReposition && (
-                  <button
-                    type="button"
-                    className="change-cover-btn reposition-trigger-btn"
-                    onClick={handleStartReposition}
-                  >
-                    <FontAwesomeIcon icon={faArrowsUpDown} style={{ fontSize: 13 }} />
-                    <span>Reposition</span>
-                  </button>
-                )}
-                <button
-                  type="button"
-                  className="change-cover-btn"
-                  onClick={() => coverInputRef.current?.click()}
-                >
-                  <FontAwesomeIcon icon={faCamera} style={{ fontSize: 13 }} />
-                  <span>Edit Cover</span>
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-        <input
-          type="file"
-          ref={coverInputRef}
-          onChange={(e) => handleMediaUpload(e, 'coverPhoto')}
-          accept="image/jpeg,image/png,image/webp"
-          style={{ display: 'none' }}
-        />
       </div>
 
       <div className="profile-header-card card">
@@ -515,27 +169,11 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
           <div className="story-ring-wrapper profile-ring">
             <div className="story-ring-inner">
               <img
-                src={profileUser.avatar}
+                src={getAvatarUrl(profileUser.avatar, profileUser.fullName || profileUser.username)}
                 alt={profileUser.fullName}
                 className="profile-avatar"
               />
             </div>
-            {isOwnProfile && (
-              <button
-                className="change-avatar-btn"
-                onClick={() => avatarInputRef.current?.click()}
-                title="Change Avatar"
-              >
-                <FontAwesomeIcon icon={faCamera} style={{ fontSize: 14 }} />
-              </button>
-            )}
-            <input
-              type="file"
-              ref={avatarInputRef}
-              onChange={(e) => handleMediaUpload(e, 'avatar')}
-              accept="image/jpeg,image/png,image/webp"
-              style={{ display: 'none' }}
-            />
           </div>
 
           <div className="profile-actions">
@@ -733,77 +371,18 @@ const Profile = ({ onOpenCreateModal, refreshKey }) => {
       )}
 
       {showEditModal && (
-        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
-          <div
-            className="edit-profile-modal card"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3>Edit Profile</h3>
-            {editProfileError && <div className="profile-action-error">{editProfileError}</div>}
-            <form onSubmit={handleSaveProfile} className="edit-profile-form">
-              <div className="edit-field">
-                <label>Full Name</label>
-                <input
-                  type="text"
-                  value={editFullName}
-                  onChange={(e) => setEditFullName(e.target.value)}
-                  className="modal-input"
-                  required
-                />
-              </div>
-
-              <div className="edit-field">
-                <label>Bio</label>
-                <textarea
-                  value={editBio}
-                  onChange={(e) => setEditBio(e.target.value)}
-                  rows={3}
-                  className="modal-textarea"
-                  maxLength={200}
-                />
-              </div>
-
-              <div className="edit-field">
-                <label>Website</label>
-                <input
-                  type="url"
-                  placeholder="https://yourwebsite.com"
-                  value={editWebsite}
-                  onChange={(e) => setEditWebsite(e.target.value)}
-                  className="modal-input"
-                />
-              </div>
-
-              <div className="edit-field">
-                <label>Location</label>
-                <input
-                  type="text"
-                  placeholder="e.g. San Francisco, CA"
-                  value={editLocation}
-                  onChange={(e) => setEditLocation(e.target.value)}
-                  className="modal-input"
-                />
-              </div>
-
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setShowEditModal(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={savingProfile}
-                >
-                  {savingProfile ? 'Saving...' : 'Done'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <EditProfileModal
+          isOpen={showEditModal}
+          initialUser={profileUser}
+          onClose={() => setShowEditModal(false)}
+          onSuccess={(updates) => {
+            setProfileUser((prev) => ({
+              ...prev,
+              ...updates,
+            }));
+            updateUser(updates);
+          }}
+        />
       )}
 
       {activeModalPost && (
